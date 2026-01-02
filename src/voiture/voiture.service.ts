@@ -1,47 +1,113 @@
-// src/voiture/voiture.service.ts
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Vehicules } from 'src/entities/user/vehicules.entity';
 import { Repository } from 'typeorm';
-
+import { Vehicules } from 'src/entities/vehicules.entity';
+import {
+  CreateVehicleDto,
+  UpdateVehicleDto,
+  VehicleQueryDto,
+} from './dto/vehicle.dto';
 
 @Injectable()
 export class VoitureService {
   constructor(
     @InjectRepository(Vehicules)
-    private voitureRepository: Repository<Vehicules>,
+    private readonly voitureRepository: Repository<Vehicules>,
   ) {}
 
-  // Récupérer toutes les voitures
-  findAll(): Promise<Vehicules[]> {
-    return this.voitureRepository.find();
+  async findAll(query: VehicleQueryDto) {
+    const { page, limit, search, etat, minPrice, maxPrice } = query;
+    const qb = this.voitureRepository.createQueryBuilder('vehicle');
+
+    if (search) {
+      qb.andWhere(
+        '(LOWER(vehicle.marque) LIKE :search OR LOWER(vehicle.modele) LIKE :search)',
+        {
+          search: `%${search.toLowerCase()}%`,
+        },
+      );
+    }
+
+    if (etat) {
+      qb.andWhere('vehicle.etat = :etat', { etat });
+    }
+
+    if (minPrice !== undefined) {
+      qb.andWhere('vehicle.prixJour >= :minPrice', { minPrice });
+    }
+
+    if (maxPrice !== undefined) {
+      qb.andWhere('vehicle.prixJour <= :maxPrice', { maxPrice });
+    }
+
+    qb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .orderBy('vehicle.createdAt', 'DESC');
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
   }
 
-  // Ajouter une voiture
-  create(voitureData: Partial<Vehicules>): Promise<Vehicules> {
-    const voiture = this.voitureRepository.create(voitureData);
-    return this.voitureRepository.save(voiture);
+  async findOne(id: number) {
+    const vehicle = await this.voitureRepository.findOne({ where: { id } });
+    if (!vehicle) {
+      throw new NotFoundException('Vehicle not found');
+    }
+    return vehicle;
   }
 
-  // Mettre à jour une voiture
-  async update(voitureData: Partial<Vehicules>): Promise<Vehicules> {
-  if (!voitureData.id) throw new Error('ID manquant');
+  async create(dto: CreateVehicleDto) {
+    const existing = await this.voitureRepository.findOne({
+      where: { immatriculation: dto.immatriculation },
+    });
 
-  await this.voitureRepository.update(voitureData.id, voitureData);
+    if (existing) {
+      throw new BadRequestException('Registration number already used');
+    }
 
-  const updated = await this.voitureRepository.findOneBy({ id: voitureData.id });
-  if (!updated) throw new Error('Voiture non trouvée');
-
-  return updated;
-}
-
-async delete(id: number): Promise<void> {
-  const result = await this.voitureRepository.delete(id);
-  if (result.affected === 0) {
-    throw new Error(`Voiture avec id ${id} non trouvée`);
+    const vehicle = this.voitureRepository.create(dto);
+    return this.voitureRepository.save(vehicle);
   }
-}
 
+  async update(id: number, dto: UpdateVehicleDto) {
+    if (dto.immatriculation) {
+      const duplicate = await this.voitureRepository.findOne({
+        where: { immatriculation: dto.immatriculation },
+      });
 
+      if (duplicate && duplicate.id !== id) {
+        throw new BadRequestException('Registration number already used');
+      }
+    }
 
+    const vehicle = await this.voitureRepository.preload({ id, ...dto });
+
+    if (!vehicle) {
+      throw new NotFoundException('Vehicle not found');
+    }
+
+    return this.voitureRepository.save(vehicle);
+  }
+
+  async delete(id: number) {
+    const result = await this.voitureRepository.delete(id);
+
+    if (!result.affected) {
+      throw new NotFoundException('Vehicle not found');
+    }
+  }
 }

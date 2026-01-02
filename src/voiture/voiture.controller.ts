@@ -1,34 +1,48 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Query,
+} from '@nestjs/common';
+import { Roles } from 'src/common/guard/roles.decorator';
+import { CreateVehicleDto, UpdateVehicleDto, VehicleQueryDto } from './dto/vehicle.dto';
 import { VoitureService } from './voiture.service';
-import { Vehicules } from 'src/entities/user/vehicules.entity';
 
-@Controller('voiture')
+@Controller('vehicles')
 export class VoitureController {
-    constructor(private readonly voitureService: VoitureService) { }
-
+    constructor(private readonly voitureService: VoitureService) {}
 
     @Get()
-    getVoitures(): Promise<Vehicules[]> {
-        return this.voitureService.findAll();
+    list(@Query() query: VehicleQueryDto) {
+        return this.voitureService.findAll(query);
+    }
+
+    @Get(':id')
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.voitureService.findOne(id);
     }
 
     @Post()
-    createVoiture(@Body() voitureData: Partial<Vehicules>): Promise<Vehicules> {
-        return this.voitureService.create(voitureData);
+    @Roles('ADMIN')
+    create(@Body() dto: CreateVehicleDto) {
+        return this.voitureService.create(dto);
     }
 
-    @Put()
-    updateVoiture(@Body() voitureData: Partial<Vehicules>): Promise<Vehicules> {
-        return this.voitureService.update(voitureData);
+    @Patch(':id')
+    @Roles('ADMIN')
+    update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateVehicleDto) {
+        return this.voitureService.update(id, dto);
     }
 
-    
- @Delete(':id')
-  async deleteVoiture(@Param('id') id: number): Promise<{ message: string }> {
-    await this.voitureService.delete(id);
-    return { message: `Voiture avec id ${id} supprimée avec succès` };
-  }
-
-
-
+    @Delete(':id')
+    @Roles('ADMIN')
+    async remove(@Param('id', ParseIntPipe) id: number) {
+        await this.voitureService.delete(id);
+        return { message: 'Vehicle deleted' };
+    }
 }

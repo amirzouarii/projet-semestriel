@@ -1,98 +1,349 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🚗 Vehicle Rental Management System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive REST API for managing vehicle rentals built with NestJS, TypeScript, and PostgreSQL. Features include role-based access control, automated payment processing, vehicle reviews, and maintenance tracking.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## ✨ Features
 
-## Description
+### Core Functionality
+- 🔐 **JWT Authentication & Authorization** - Secure login/register with role-based access (ADMIN/USER)
+- 🚙 **Vehicle Management** - Full CRUD with search, filtering, and availability tracking
+- 📅 **Reservation System** - Smart booking with conflict detection and auto-pricing
+- 💰 **Payment Processing** - Cash payment tracking with status management
+- ⭐ **Review System** - User ratings and verified reviews for vehicles
+- 🔧 **Maintenance Tracking** - Service history and cost management
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Technical Features
+- ✅ **Input Validation** - Comprehensive DTO validation with class-validator
+- 📄 **Pagination** - Consistent pagination across all list endpoints
+- 🔒 **RBAC** - Role-based access control with guard decorators
+- 🛡️ **Security** - Password hashing, JWT tokens, SQL injection prevention
+- 📊 **Database Relations** - Properly structured entities with cascade operations
+- 🎯 **Type Safety** - Full TypeScript support throughout
 
-## Project setup
+## 🛠️ Tech Stack
+
+- **Framework:** NestJS 11.x
+- **Language:** TypeScript 5.x
+- **Database:** PostgreSQL with TypeORM
+- **Authentication:** JWT (jsonwebtoken)
+- **Validation:** class-validator & class-transformer
+- **Security:** bcrypt for password hashing
+- **ORM:** TypeORM with decorators and query builder
+
+## 📦 Database Entities
+
+### User
+- Authentication and profile management
+- Roles: ADMIN | USER
+- Relations: OneToMany(Reservations)
+
+### Vehicules
+- Vehicle inventory with specifications
+- Fields: marque, modele, immatriculation (unique), etat, prixJour, image
+- Relations: OneToMany(Reservations, Maintenances)
+
+### Reservation
+- Booking system with date ranges
+- Status: PENDING | APPROVED | CANCELLED
+- Auto-calculated totalPrice based on duration
+- Relations: ManyToOne(User, Vehicules), OneToOne(Payment)
+
+### Payment
+- Payment tracking for reservations
+- Method: CASH | CARD | BANK_TRANSFER
+- Status: PENDING | COMPLETED | FAILED
+- Relations: OneToOne(Reservation), ManyToOne(User)
+
+### Maintenance
+- Service history for vehicles
+- Tracks description, date, cost
+- Relations: ManyToOne(Vehicules)
+
+### Review
+- User reviews for vehicles
+- Rating: 1-5 stars with optional comment
+- Verified flag for admin approval
+- Relations: ManyToOne(User, Vehicules, Reservation)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- PostgreSQL 14+
+- Git
+
+### Installation
 
 ```bash
-$ npm install
+# Clone the repository
+git clone <repository-url>
+cd projet-semestriel
+
+# Install dependencies
+npm install
 ```
 
-## Compile and run the project
+### Environment Configuration
+
+Create a `.env` file in the root directory:
+
+```env
+# Database
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USER=postgres
+DATABASE_PASSWORD=admin
+DATABASE_NAME=prj_voitures
+
+# JWT
+JWT_SECRET=your-secret-key-change-in-production
+
+# Server
+PORT=3000
+```
+
+### Database Setup
 
 ```bash
-# development
-$ npm run start
+# Create PostgreSQL database
+psql -U postgres
+CREATE DATABASE prj_voitures;
+\q
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# TypeORM will auto-sync tables on first run (synchronize: true in app.module.ts)
+# For production, use migrations instead
 ```
 
-## Run tests
+## 🏃 Running the Application
 
 ```bash
-# unit tests
-$ npm run test
+# Development mode with hot-reload
+npm run start:dev
 
-# e2e tests
-$ npm run test:e2e
+# Production build and run
+npm run build
+npm run start:prod
 
-# test coverage
-$ npm run test:cov
+# Debug mode
+npm run start:debug
 ```
 
-## Deployment
+The API will be available at `http://localhost:3000`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 📚 API Documentation
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Complete API documentation is available in [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
+
+### Quick Reference
+
+#### Authentication
+- `POST /auth/register` - Create new user account
+- `POST /auth/login` - Login and receive JWT token
+
+#### Users
+- `GET /users/me` - Get current user profile
+- `GET /users` - [ADMIN] List all users with pagination
+
+#### Vehicles
+- `GET /vehicles` - List vehicles with filters (search, etat, price range)
+- `GET /vehicles/:id` - Get vehicle details
+- `POST /vehicles` - [ADMIN] Create vehicle
+- `PATCH /vehicles/:id` - [ADMIN] Update vehicle
+- `DELETE /vehicles/:id` - [ADMIN] Delete vehicle
+
+#### Reservations
+- `POST /reservations` - Create reservation (auto-calculates price)
+- `GET /reservations` - List reservations (users see only theirs)
+- `PATCH /reservations/:id/status` - [ADMIN] Update status
+- `PATCH /reservations/:id/cancel` - Cancel reservation
+
+#### Payments
+- `POST /payments` - Create payment for reservation
+- `GET /payments` - List payments with filters
+- `PATCH /payments/:id/complete` - Mark payment as completed
+- `PATCH /payments/:id/fail` - Mark payment as failed
+
+#### Reviews
+- `POST /reviews` - Create review for vehicle
+- `GET /reviews` - List reviews with filters
+- `GET /reviews/vehicle/:id/average` - Get average rating
+- `PATCH /reviews/:id` - Update own review
+- `PATCH /reviews/:id/verify` - [ADMIN] Verify review
+
+#### Maintenance
+- `POST /maintenance` - [ADMIN] Create maintenance record
+- `GET /maintenance` - [ADMIN] List maintenance records
+- `PATCH /maintenance/:id` - [ADMIN] Update maintenance
+- `DELETE /maintenance/:id` - [ADMIN] Delete maintenance
+
+### Authentication
+
+All protected endpoints require a JWT token in the Authorization header:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+Authorization: Bearer <your-jwt-token>
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Example Requests
 
-## Resources
+**Register a new user:**
+```bash
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "secure123"
+  }'
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+**Create a reservation:**
+```bash
+curl -X POST http://localhost:3000/reservations \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "vehicleId": 1,
+    "startDate": "2026-01-15T08:00:00Z",
+    "endDate": "2026-01-20T18:00:00Z"
+  }'
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+**Search vehicles:**
+```bash
+curl "http://localhost:3000/vehicles?page=1&limit=10&search=Toyota&minPrice=30&maxPrice=100"
+```
 
-## Support
+## 📁 Project Structure
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
+src/
+├── auth/               # Authentication module (login, register, JWT)
+├── user/               # User management (profile, list)
+├── voiture/            # Vehicle CRUD with search/filters
+├── reservation/        # Booking system with conflict detection
+├── payment/            # Payment processing and tracking
+├── review/             # Review and rating system
+├── maintenance/        # Vehicle maintenance records
+├── common/
+│   ├── guard/          # RolesGuard & decorators for RBAC
+│   ├── hashing/        # bcrypt password hashing service
+│   ├── jwt-service/    # JWT token generation/verification
+│   ├── dto/            # Shared DTOs (pagination)
+│   ├── types/          # TypeScript types and interfaces
+│   └── utils/          # Utility functions and constants
+├── entities/           # TypeORM entities (database models)
+├── app.module.ts       # Root module with global configuration
+└── main.ts             # Application entry point with ValidationPipe
+```
 
-## Stay in touch
+## 🧪 Testing
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+# Unit tests
+npm run test
 
-## License
+# E2E tests
+npm run test:e2e
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Test coverage
+npm run test:cov
+```
+
+## 🔒 Security Features
+
+- ✅ Password hashing with bcrypt (10 salt rounds)
+- ✅ JWT-based authentication with role claims
+- ✅ Role-based authorization on endpoints
+- ✅ Input validation and sanitization
+- ✅ SQL injection prevention (TypeORM parameterized queries)
+- ✅ Rate limiting ready (add middleware as needed)
+- ✅ CORS configuration ready (configure in main.ts)
+
+## 🎯 Key Business Logic
+
+### Reservation System
+- Automatic price calculation: `(endDate - startDate) × vehicleDailyRate`
+- Conflict detection: Prevents double-booking of vehicles
+- Status workflow: PENDING → APPROVED (on payment) → CANCELLED
+
+### Payment Processing
+- Amount validation against reservation total
+- Auto-approval of reservation when payment completed
+- Multiple payment methods supported (CASH, CARD, BANK_TRANSFER)
+
+### Review System
+- One review per user per vehicle (prevents spam)
+- Admin verification system for trusted reviews
+- Average rating calculation per vehicle
+- Optional linking to completed reservations
+
+### Access Control
+| Feature | USER | ADMIN |
+|---------|------|-------|
+| View vehicles | ✅ | ✅ |
+| Create reservation | ✅ (own) | ✅ (any user) |
+| View reservations | ✅ (own) | ✅ (all) |
+| Approve reservations | ❌ | ✅ |
+| Manage vehicles | ❌ | ✅ |
+| Manage maintenance | ❌ | ✅ |
+| Create payments | ✅ (own) | ✅ (any) |
+| Create reviews | ✅ | ✅ |
+| Verify reviews | ❌ | ✅ |
+
+## 🚀 Deployment
+
+### Production Checklist
+
+- [ ] Change `JWT_SECRET` to a strong random value
+- [ ] Set `synchronize: false` in TypeORM config
+- [ ] Set up database migrations
+- [ ] Enable HTTPS
+- [ ] Configure CORS for your domain
+- [ ] Add rate limiting middleware
+- [ ] Set up logging and monitoring
+- [ ] Configure environment variables properly
+- [ ] Set up automated backups for PostgreSQL
+- [ ] Add health check endpoint
+
+### Environment Variables for Production
+
+```env
+NODE_ENV=production
+DATABASE_HOST=<your-db-host>
+DATABASE_PORT=5432
+DATABASE_USER=<your-db-user>
+DATABASE_PASSWORD=<strong-password>
+DATABASE_NAME=prj_voitures
+JWT_SECRET=<strong-random-secret>
+PORT=3000
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- Built with [NestJS](https://nestjs.com/)
+- Database ORM: [TypeORM](https://typeorm.io/)
+- Validation: [class-validator](https://github.com/typestack/class-validator)
+
+## 📧 Contact
+
+For questions or support, please open an issue in the repository.
+
+---
+
+**Made with ❤️ using NestJS and TypeScript**

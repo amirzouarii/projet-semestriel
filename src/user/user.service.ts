@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/entities/user/user.entity';
 import { Repository } from 'typeorm';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { User } from 'src/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 
 interface CreateUserDto {
@@ -18,8 +19,8 @@ export class UsersService {
   ) {}
 
   findByEmail(email: string): Promise<User | null> {
-  return this.usersRepository.findOne({ where: { email } });
-}
+    return this.usersRepository.findOne({ where: { email } });
+  }
 
 
   async createUser(data: CreateUserDto): Promise<User> {
@@ -31,5 +32,38 @@ export class UsersService {
     });
 
     return this.usersRepository.save(user);
+  }
+
+  async findProfile(id: number) {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      select: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async findAll(query: PaginationQueryDto) {
+    const { page, limit } = query;
+    const [data, total] = await this.usersRepository.findAndCount({
+      select: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+
+    return {
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
   }
 }
