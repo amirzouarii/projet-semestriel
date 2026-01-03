@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useState, useRef, useId } from "react";
-import { SearchIcon } from "lucide-react";
-import type { ComponentProps } from "react";
+import { SearchIcon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
@@ -16,8 +15,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@radix-ui/react-popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../dropdown-menu";
 import { Button } from "../../button";
 import { Input } from "../../input";
+import { Avatar, AvatarFallback } from "../../avatar";
 
 // Simple logo component for the navbar
 const Logo = (props: React.SVGAttributes<SVGElement>) => {
@@ -104,6 +111,12 @@ export interface Navbar04Props extends React.HTMLAttributes<HTMLElement> {
   onSignInClick?: () => void;
   onCartClick?: () => void;
   onSearchSubmit?: (query: string) => void;
+  user?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  } | null;
+  onLogout?: () => void;
 }
 
 // Default navigation links
@@ -129,6 +142,8 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
       onSignInClick,
       onCartClick,
       onSearchSubmit,
+      user = null,
+      onLogout,
       ...props
     },
     ref
@@ -273,8 +288,8 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
               </button>
               {/* Navigation menu */}
               {!isMobile && (
-                <NavigationMenu className="flex">
-                  <NavigationMenuList className="gap-1">
+                <NavigationMenu className="flex" orientation="horizontal">
+                  <NavigationMenuList className="flex flex-row gap-1">
                     {navigationLinks.map((link, index) => (
                       <NavigationMenuItem key={index}>
                         <NavigationMenuLink
@@ -307,32 +322,67 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
           {/* Right side */}
           {!isMobile && (
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-                onClick={(e: { preventDefault: () => void }) => {
-                  e.preventDefault();
-                  if (onSignInClick) onSignInClick();
-                }}
-              >
-                {signInText}
-              </Button>
-              <Button
-                size="sm"
-                className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-                onClick={(e: { preventDefault: () => void }) => {
-                  e.preventDefault();
-                  if (onCartClick) onCartClick();
-                }}
-              >
-                <span className="flex items-baseline gap-2">
-                  {cartText}
-                  <span className="text-primary-foreground/60 text-xs">
-                    {cartCount}
-                  </span>
-                </span>
-              </Button>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
+                      <Avatar className="size-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {user.firstName[0]}{user.lastName[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium">
+                        {user.firstName} {user.lastName}
+                      </span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-3 py-2">
+                      <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (onLogout) onLogout();
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <LogOut size={16} className="mr-2" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                    onClick={(e: { preventDefault: () => void }) => {
+                      e.preventDefault();
+                      if (onSignInClick) onSignInClick();
+                    }}
+                  >
+                    {signInText}
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
+                    onClick={(e: { preventDefault: () => void }) => {
+                      e.preventDefault();
+                      if (onCartClick) onCartClick();
+                    }}
+                  >
+                    <span className="flex items-baseline gap-2">
+                      {cartText}
+                      <span className="text-primary-foreground/60 text-xs">
+                        {cartCount}
+                      </span>
+                    </span>
+                  </Button>
+                </>
+              )}
             </div>
           )}
         </div>

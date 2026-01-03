@@ -32,6 +32,27 @@ export class Vehicules {
   @Column({ type: 'varchar', length: 255, nullable: true })
   image: string;
 
+  @Column({ type: 'int', nullable: true })
+  annee: number;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  couleur: string;
+
+  @Column({ type: 'int', nullable: true })
+  kilometrage: number;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  carburant: string; // essence, diesel, électrique, hybride
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  transmission: string; // manuelle, automatique
+
+  @Column({ type: 'int', nullable: true })
+  places: number;
+
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
   @OneToMany(() => Reservation, (reservation) => reservation.vehicle)
   reservations: Reservation[];
 

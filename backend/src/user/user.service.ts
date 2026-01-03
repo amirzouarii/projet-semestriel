@@ -22,7 +22,6 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
-
   async createUser(data: CreateUserDto): Promise<User> {
     const hashed = await bcrypt.hash(data.password, 10);
 
@@ -37,7 +36,15 @@ export class UsersService {
   async findProfile(id: number) {
     const user = await this.usersRepository.findOne({
       where: { id },
-      select: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt'],
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'role',
+        'createdAt',
+        'updatedAt',
+      ],
     });
 
     if (!user) {
@@ -50,7 +57,15 @@ export class UsersService {
   async findAll(query: PaginationQueryDto) {
     const { page, limit } = query;
     const [data, total] = await this.usersRepository.findAndCount({
-      select: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt'],
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'role',
+        'createdAt',
+        'updatedAt',
+      ],
       skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'DESC' },

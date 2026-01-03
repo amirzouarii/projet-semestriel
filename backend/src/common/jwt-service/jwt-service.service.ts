@@ -4,7 +4,9 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export type TokenPayload = JwtPayload & {
   userId: number;
-  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
   role: string;
 };
 
@@ -23,6 +25,6 @@ export class JwtServiceService {
   generateToken(payload: TokenPayload): string {
     const secretKey =
       this.configService.get<string>('JWT_SECRET') || 'default-secret';
-    return jwt.sign(payload, secretKey);
+    return jwt.sign(payload, secretKey, { expiresIn: '7d' });
   }
 }

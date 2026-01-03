@@ -43,14 +43,16 @@ export class AuthService {
 
     const token = this.jwtService.generateToken({
       userId: user.id,
-      username: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
       role: user.role,
     });
 
     return { token };
   }
 
-  async registerUser(dto: { name: string; email: string; password: string }) {
+  async registerUser(dto: { firstName: string; lastName: string; email: string; password: string }) {
     const existingUser = await this.userRepository.findOne({
       where: {
         email: dto.email,
@@ -66,7 +68,8 @@ export class AuthService {
 
     const hashedPassword = await this.hashingService.hash(dto.password);
     const newUser = this.userRepository.create({
-      name: dto.name,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
       email: dto.email,
       password: hashedPassword,
       role: 'USER',
@@ -76,7 +79,9 @@ export class AuthService {
 
     const token = this.jwtService.generateToken({
       userId: newUser.id,
-      username: newUser.name,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      email: newUser.email,
       role: newUser.role,
     });
 

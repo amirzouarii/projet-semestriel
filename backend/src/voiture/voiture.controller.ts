@@ -22,6 +22,21 @@ export class VoitureController {
         return this.voitureService.findAll(query);
     }
 
+    @Get('marques/all')
+    getAllMarques() {
+        return this.voitureService.getAllMarques();
+    }
+
+    @Get('carburants/all')
+    getAllCarburants() {
+        return this.voitureService.getAllCarburants();
+    }
+
+    @Get('transmissions/all')
+    getAllTransmissions() {
+        return this.voitureService.getAllTransmissions();
+    }
+
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.voitureService.findOne(id);

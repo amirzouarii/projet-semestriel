@@ -20,7 +20,18 @@ export class VoitureService {
   ) {}
 
   async findAll(query: VehicleQueryDto) {
-    const { page, limit, search, etat, minPrice, maxPrice } = query;
+    const {
+      page,
+      limit,
+      search,
+      etat,
+      marque,
+      carburant,
+      transmission,
+      minPlaces,
+      minPrice,
+      maxPrice,
+    } = query;
     const qb = this.voitureRepository.createQueryBuilder('vehicle');
 
     if (search) {
@@ -34,6 +45,22 @@ export class VoitureService {
 
     if (etat) {
       qb.andWhere('vehicle.etat = :etat', { etat });
+    }
+
+    if (marque) {
+      qb.andWhere('vehicle.marque = :marque', { marque });
+    }
+
+    if (carburant) {
+      qb.andWhere('vehicle.carburant = :carburant', { carburant });
+    }
+
+    if (transmission) {
+      qb.andWhere('vehicle.transmission = :transmission', { transmission });
+    }
+
+    if (minPlaces !== undefined) {
+      qb.andWhere('vehicle.places >= :minPlaces', { minPlaces });
     }
 
     if (minPrice !== undefined) {
@@ -60,6 +87,38 @@ export class VoitureService {
         totalPages: Math.ceil(total / limit) || 1,
       },
     };
+  }
+
+  async getAllMarques() {
+    const marques = await this.voitureRepository
+      .createQueryBuilder('vehicle')
+      .select('DISTINCT vehicle.marque', 'marque')
+      .orderBy('vehicle.marque', 'ASC')
+      .getRawMany();
+
+    return marques.map((item) => item.marque);
+  }
+
+  async getAllCarburants() {
+    const carburants = await this.voitureRepository
+      .createQueryBuilder('vehicle')
+      .select('DISTINCT vehicle.carburant', 'carburant')
+      .where('vehicle.carburant IS NOT NULL')
+      .orderBy('vehicle.carburant', 'ASC')
+      .getRawMany();
+
+    return carburants.map((item) => item.carburant);
+  }
+
+  async getAllTransmissions() {
+    const transmissions = await this.voitureRepository
+      .createQueryBuilder('vehicle')
+      .select('DISTINCT vehicle.transmission', 'transmission')
+      .where('vehicle.transmission IS NOT NULL')
+      .orderBy('vehicle.transmission', 'ASC')
+      .getRawMany();
+
+    return transmissions.map((item) => item.transmission);
   }
 
   async findOne(id: number) {
