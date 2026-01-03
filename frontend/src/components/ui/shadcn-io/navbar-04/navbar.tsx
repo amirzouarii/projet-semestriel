@@ -111,6 +111,7 @@ export interface Navbar04Props extends React.HTMLAttributes<HTMLElement> {
   onSignInClick?: () => void;
   onCartClick?: () => void;
   onSearchSubmit?: (query: string) => void;
+  onReservationsClick?: () => void;
   user?: {
     firstName: string;
     lastName: string;
@@ -142,6 +143,7 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
       onSignInClick,
       onCartClick,
       onSearchSubmit,
+      onReservationsClick,
       user = null,
       onLogout,
       ...props
@@ -292,13 +294,16 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
                   <NavigationMenuList className="flex flex-row gap-1">
                     {navigationLinks.map((link, index) => (
                       <NavigationMenuItem key={index}>
-                        <NavigationMenuLink
-                          href={link.href}
-                          onClick={(e) => e.preventDefault()}
+                        <button
+                          onClick={() => {
+                            if (link.href) {
+                              window.location.href = link.href;
+                            }
+                          }}
                           className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                         >
                           {link.label}
-                        </NavigationMenuLink>
+                        </button>
                       </NavigationMenuItem>
                     ))}
                   </NavigationMenuList>
@@ -322,6 +327,18 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
           {/* Right side */}
           {!isMobile && (
             <div className="flex items-center gap-3">
+              {user && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-sm font-medium hover:bg-primary hover:text-primary-foreground"
+                  onClick={() => {
+                    if (onReservationsClick) onReservationsClick();
+                  }}
+                >
+                  <span>Mes Réservations</span>
+                </Button>
+              )}
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -354,34 +371,16 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-                    onClick={(e: { preventDefault: () => void }) => {
-                      e.preventDefault();
-                      if (onSignInClick) onSignInClick();
-                    }}
-                  >
-                    {signInText}
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-                    onClick={(e: { preventDefault: () => void }) => {
-                      e.preventDefault();
-                      if (onCartClick) onCartClick();
-                    }}
-                  >
-                    <span className="flex items-baseline gap-2">
-                      {cartText}
-                      <span className="text-primary-foreground/60 text-xs">
-                        {cartCount}
-                      </span>
-                    </span>
-                  </Button>
-                </>
+                <Button
+                  size="sm"
+                  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
+                  onClick={(e: { preventDefault: () => void }) => {
+                    e.preventDefault();
+                    if (onSignInClick) onSignInClick();
+                  }}
+                >
+                  {signInText}
+                </Button>
               )}
             </div>
           )}

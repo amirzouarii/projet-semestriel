@@ -13,6 +13,7 @@ interface AuthContextType {
   token: string | null;
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (jwt: string) => void;
   logout: () => void;
 }
@@ -50,6 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("jwt");
@@ -61,6 +63,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       localStorage.removeItem("jwt");
     }
+    
+    setIsLoading(false);
   }, []);
 
   const login = (jwt: string) => {
@@ -84,7 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, isAuthenticated, login, logout }}
+      value={{ token, user, isAuthenticated, isLoading, login, logout }}
     >
       {children}
     </AuthContext.Provider>

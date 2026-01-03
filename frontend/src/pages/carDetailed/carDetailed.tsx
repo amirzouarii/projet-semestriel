@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import api from "../../lib/api";
 import {
   ArrowLeft,
@@ -9,12 +12,12 @@ import {
   Car,
   DollarSign,
   Shield,
-  Clock,
   Fuel,
   Gauge,
   Users,
   Settings,
   Palette,
+  CalendarCheck,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -41,12 +44,27 @@ function CarDetailed() {
   const navigate = useNavigate();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reserving, setReserving] = useState(false);
+  
+  // Reservation form state
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [calculatedPrice, setCalculatedPrice] = useState<number | null>(null);
 
   useEffect(() => {
     if (id) {
       fetchVehicle();
     }
   }, [id]);
+
+  // Calculate price when dates change
+  useEffect(() => {
+    if (startDate && endDate && vehicle) {
+      calculateTotalPrice();
+    } else {
+      setCalculatedPrice(null);
+    }
+  }, [startDate, endDate, vehicle]);
 
   const fetchVehicle = async () => {
     try {
@@ -62,14 +80,113 @@ function CarDetailed() {
     }
   };
 
-  const handleReserve = () => {
+  const calculateTotalPrice = () => {
+    if (!startDate || !endDate || !vehicle) {
+      setCalculatedPrice(null);
+      return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Validate dates
+    if (start >= end) {
+      setCalculatedPrice(null);
+      return;
+    }
+
+    // Calculate duration in days
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const durationDays = Math.ceil((end.getTime() - start.getTime()) / msPerDay);
+
+    if (durationDays <= 0) {
+      setCalculatedPrice(null);
+      return;
+    }
+
+    // Calculate total price
+    const total = durationDays * Number(vehicle.prixJour);
+    setCalculatedPrice(total);
+  };
+
+  const handleReservation = async () => {
+    // Check authentication
     const token = localStorage.getItem("jwt");
     if (!token) {
       toast.info("Veuillez vous connecter pour réserver");
       navigate("/login");
       return;
     }
-    navigate(`/reservation/${id}`);
+
+    // Validate dates
+    if (!startDate || !endDate) {
+      toast.error("Veuillez sélectionner les dates de début et de fin");
+      return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start >= end) {
+      toast.error("La date de début doit être avant la date de fin");
+      return;
+    }
+
+    // Check if dates are in the past
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    if (start < now) {
+      toast.error("La date de début ne peut pas être dans le passé");
+      return;
+    }
+
+    try {
+      setReserving(true);
+
+      // Create reservation following backend DTO structure
+      const reservationData = {
+        startDate: start.toISOString(),
+        endDate: end.toISOString(),
+        vehicleId: Number(id),
+      };
+
+      await api.post("/reservations", reservationData);
+
+      toast.success("Réservation créée avec succès!");
+      
+      // Reset form
+      setStartDate("");
+      setEndDate("");
+      setCalculatedPrice(null);
+
+      // Navigate to reservations page
+      setTimeout(() => {
+        navigate("/reservations");
+      }, 1500);
+
+    } catch (error: any) {
+      console.error("Error creating reservation:", error);
+      
+      // Handle specific error messages from backend
+      const errorMessage = error.response?.data?.message;
+      
+      if (Array.isArray(errorMessage)) {
+        toast.error(errorMessage.join(", "));
+      } else if (errorMessage) {
+        // Handle common backend errors
+        if (errorMessage.includes("already reserved")) {
+          toast.error("Ce véhicule est déjà réservé pour ces dates");
+        } else if (errorMessage.includes("not found")) {
+          toast.error("Véhicule non trouvé");
+        } else {
+          toast.error(errorMessage);
+        }
+      } else {
+        toast.error("Impossible de créer la réservation");
+      }
+    } finally {
+      setReserving(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -245,22 +362,87 @@ function CarDetailed() {
                 </div>
               </div>
 
+              {/* Reservation Form */}
+              {vehicle.etat.toLowerCase() === "disponible" && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CalendarCheck className="w-5 h-5" />
+                      Réserver ce véhicule
+                    </CardTitle>
+                    <CardDescription>
+                      Sélectionnez vos dates de location
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="startDate">Date de début</Label>
+                        <Input
+                          id="startDate"
+                          type="date"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          min={new Date().toISOString().split("T")[0]}
+                          disabled={reserving}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="endDate">Date de fin</Label>
+                        <Input
+                          id="endDate"
+                          type="date"
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                          min={startDate || new Date().toISOString().split("T")[0]}
+                          disabled={reserving}
+                        />
+                      </div>
+                    </div>
+
+                    {calculatedPrice !== null && startDate && endDate && (
+                      <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              Prix total estimé
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {Math.ceil(
+                                (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+                                (1000 * 60 * 60 * 24)
+                              )} jour(s) × {Number(vehicle.prixJour).toFixed(2)}€
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-3xl font-bold text-primary">
+                              {calculatedPrice.toFixed(2)}€
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <Button
+                      size="lg"
+                      className="w-full"
+                      onClick={handleReservation}
+                      disabled={!startDate || !endDate || calculatedPrice === null || reserving}
+                    >
+                      {reserving ? "Réservation en cours..." : "Confirmer la réservation"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Action Buttons */}
               <div className="space-y-3 pt-4">
-                <Button
-                  size="lg"
-                  className="w-full text-lg"
-                  onClick={handleReserve}
-                  disabled={vehicle.etat.toLowerCase() !== "disponible"}
-                >
-                  {vehicle.etat.toLowerCase() === "disponible"
-                    ? "Réserver maintenant"
-                    : "Non disponible"}
-                </Button>
                 {vehicle.etat.toLowerCase() !== "disponible" && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    Ce véhicule n'est pas disponible à la réservation pour le moment
-                  </p>
+                  <div className="p-4 bg-muted rounded-lg text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Ce véhicule n'est pas disponible à la réservation pour le moment
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
