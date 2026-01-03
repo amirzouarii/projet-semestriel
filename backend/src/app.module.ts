@@ -27,9 +27,9 @@ import { ReviewModule } from './review/review.module';
       username: 'postgres',
       password: 'admin',
       database: 'prj_voitures',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'], // toutes les entités automatiquement
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
-      logging: true, // utile pour voir les requêtes SQL
+      logging: true,
     }),
     AuthModule,
     VoitureModule,
