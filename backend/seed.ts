@@ -13,7 +13,7 @@ const AppDataSource = new DataSource({
   port: 5432,
   username: 'postgres',
   password: 'admin',
-  database: 'prj_voitures',
+  database: 'prj_voitures2',
   entities: [User, Vehicules, Reservation, Payment, Maintenance, Review],
   synchronize: true,
   logging: false,

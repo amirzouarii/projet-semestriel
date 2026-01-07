@@ -17,6 +17,7 @@ import {
   AlertCircle,
   XCircle,
   ArrowLeft,
+  Car,
 } from "lucide-react";
 
 interface Reservation {
@@ -27,10 +28,15 @@ interface Reservation {
   totalPrice: number;
   vehicle: {
     id: number;
-    make: string;
-    model: string;
-    year: number;
-    licensePlate: string;
+    // backend uses French field names; accept both shapes for safety
+    make?: string;
+    model?: string;
+    year?: number;
+    licensePlate?: string;
+    marque?: string;
+    modele?: string;
+    immatriculation?: string;
+    image?: string;
   };
 }
 
@@ -242,18 +248,27 @@ export default function ReservationsPage() {
                       {/* Vehicle & Dates */}
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h2 className="text-2xl font-bold text-foreground mb-1">
-                              {reservation.vehicle.make}{" "}
-                              <span className="text-muted-foreground">
-                                {reservation.vehicle.model}
-                              </span>
-                            </h2>
-                            <p className="text-sm text-muted-foreground flex items-center gap-2">
-                              <MapPin className="w-4 h-4" />
-                              {reservation.vehicle.licensePlate}
-                            </p>
-                          </div>
+                            <div className="flex items-center gap-4">
+                              {reservation.vehicle.image ? (
+                                <img src={reservation.vehicle.image} alt={`${reservation.vehicle.marque ?? reservation.vehicle.make} ${reservation.vehicle.modele ?? reservation.vehicle.model}`} className="w-36 h-24 object-cover rounded-md" />
+                              ) : (
+                                <div className="w-36 h-24 bg-muted rounded-md flex items-center justify-center">
+                                  <Car className="w-8 h-8 text-muted-foreground" />
+                                </div>
+                              )}
+                              <div>
+                                <h2 className="text-2xl font-bold text-foreground mb-1">
+                                  {reservation.vehicle.marque ?? reservation.vehicle.make}{" "}
+                                  <span className="text-muted-foreground">
+                                    {reservation.vehicle.modele ?? reservation.vehicle.model}
+                                  </span>
+                                </h2>
+                                <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <MapPin className="w-4 h-4" />
+                                  {reservation.vehicle.immatriculation ?? reservation.vehicle.licensePlate}
+                                </p>
+                              </div>
+                            </div>
                           <Badge
                             variant="outline"
                             className="gap-2"

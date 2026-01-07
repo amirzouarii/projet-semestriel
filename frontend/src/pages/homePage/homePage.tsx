@@ -57,7 +57,7 @@ function HomePage() {
       navigate("/login");
       return;
     }
-    navigate(`/reservation/${id}`);
+    navigate(`/car/${id}`);
   };
 
   // Show only first 6 vehicles on homepage

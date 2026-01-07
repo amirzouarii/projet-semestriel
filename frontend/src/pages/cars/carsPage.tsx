@@ -104,7 +104,7 @@ function CarsPage() {
       navigate("/login");
       return;
     }
-    navigate(`/reservation/${id}`);
+    navigate(`/car/${id}`);
   };
 
   return (
@@ -226,26 +226,26 @@ function CarsPage() {
                   </Badge>
                   <Badge
                     variant={
-                      statusFilter === "disponible" ? "default" : "outline"
+                      statusFilter === "Disponible" ? "default" : "outline"
                     }
                     className="cursor-pointer px-4 py-1.5"
-                    onClick={() => setStatusFilter("disponible")}
+                    onClick={() => setStatusFilter("Disponible")}
                   >
                     Disponible
                   </Badge>
                   <Badge
                     variant={
-                      statusFilter === "en maintenance" ? "default" : "outline"
+                      statusFilter === "En maintenance" ? "default" : "outline"
                     }
                     className="cursor-pointer px-4 py-1.5"
-                    onClick={() => setStatusFilter("en maintenance")}
+                    onClick={() => setStatusFilter("En maintenance")}
                   >
                     En Maintenance
                   </Badge>
                   <Badge
-                    variant={statusFilter === "loué" ? "default" : "outline"}
+                    variant={statusFilter === "Loué" ? "default" : "outline"}
                     className="cursor-pointer px-4 py-1.5"
-                    onClick={() => setStatusFilter("loué")}
+                    onClick={() => setStatusFilter("Loué")}
                   >
                     Loué
                   </Badge>

@@ -129,7 +129,14 @@ function Login() {
             </Button>
             <p className="text-center text-muted-foreground text-sm">
               Don't have an account?{" "}
-              <a className="hover:underline" href="/register">
+              <a
+                className="hover:underline cursor-pointer"
+                href="/register"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/register');
+                }}
+              >
                 Sign up
               </a>
             </p>

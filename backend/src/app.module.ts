@@ -26,7 +26,7 @@ import { ReviewModule } from './review/review.module';
       port: 5432,
       username: 'postgres',
       password: 'admin',
-      database: 'prj_voitures',
+      database: 'prj_voitures2',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
       logging: true,

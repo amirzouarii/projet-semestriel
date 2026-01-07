@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useState, useRef, useId } from "react";
+import { useNavigate } from "react-router-dom";
 import { SearchIcon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -26,38 +27,7 @@ import { Button } from "../../button";
 import { Input } from "../../input";
 import { Avatar, AvatarFallback } from "../../avatar";
 
-// Simple logo component for the navbar
-const Logo = (props: React.SVGAttributes<SVGElement>) => {
-  return (
-    <svg
-      width="1em"
-      height="1em"
-      viewBox="0 0 324 323"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-      {...(props as any)}
-    >
-      <rect
-        x="88.1023"
-        y="144.792"
-        width="151.802"
-        height="36.5788"
-        rx="18.2894"
-        transform="rotate(-38.5799 88.1023 144.792)"
-        fill="currentColor"
-      />
-      <rect
-        x="85.3459"
-        y="244.537"
-        width="151.802"
-        height="36.5788"
-        rx="18.2894"
-        transform="rotate(-38.5799 85.3459 244.537)"
-        fill="currentColor"
-      />
-    </svg>
-  );
-};
+
 
 // Hamburger icon component
 const HamburgerIcon = ({
@@ -116,6 +86,7 @@ export interface Navbar04Props extends React.HTMLAttributes<HTMLElement> {
     firstName: string;
     lastName: string;
     email: string;
+    role?: string;
   } | null;
   onLogout?: () => void;
 }
@@ -131,7 +102,7 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
   (
     {
       className,
-      logo = <Logo />,
+      logo = <img src="../../../../../public/logovoi.webp" alt="image" />,
       logoHref = "#",
       navigationLinks = defaultNavigationLinks,
       signInText = "Sign In",
@@ -153,6 +124,7 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
     const [isMobile, setIsMobile] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
     const searchId = useId();
+    const navigate = useNavigate();
 
     useEffect(() => {
       const checkWidth = () => {
@@ -187,14 +159,7 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
       [ref]
     );
 
-    const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      const query = formData.get("search") as string;
-      if (onSearchSubmit) {
-        onSearchSubmit(query);
-      }
-    };
+    
 
     return (
       <header
@@ -246,6 +211,14 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
                       </NavigationMenuItem>
                       <NavigationMenuItem className="w-full">
                         <button
+                          onClick={() => navigate('/register')}
+                          className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline"
+                        >
+                          Sign up
+                        </button>
+                      </NavigationMenuItem>
+                      <NavigationMenuItem className="w-full">
+                        <button
                           onClick={(e) => {
                             e.preventDefault();
                             if (onSignInClick) onSignInClick();
@@ -280,13 +253,11 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
             {/* Main nav */}
             <div className="flex flex-1 items-center gap-6 max-md:justify-between">
               <button
-                onClick={(e) => e.preventDefault()}
+                onClick={() => navigate('/')}
                 className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
               >
-                <div className="text-2xl">{logo}</div>
-                <span className="hidden font-bold text-xl sm:inline-block">
-                  shadcn.io
-                </span>
+                <div className="w-[95px] h-auto">{logo}</div>
+                
               </button>
               {/* Navigation menu */}
               {!isMobile && (
@@ -297,7 +268,7 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
                         <button
                           onClick={() => {
                             if (link.href) {
-                              window.location.href = link.href;
+                              navigate(link.href);
                             }
                           }}
                           className="text-muted-foreground hover:text-primary py-1.5 font-medium transition-colors cursor-pointer group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
@@ -309,19 +280,8 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
                   </NavigationMenuList>
                 </NavigationMenu>
               )}
-              {/* Search form */}
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <Input
-                  id={searchId}
-                  name="search"
-                  className="peer h-8 ps-8 pe-2"
-                  placeholder={searchPlaceholder}
-                  type="search"
-                />
-                <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 peer-disabled:opacity-50">
-                  <SearchIcon size={16} />
-                </div>
-              </form>
+              
+              
             </div>
           </div>
           {/* Right side */}
@@ -358,6 +318,14 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
                       <p className="text-sm font-medium">{user.firstName} {user.lastName}</p>
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
+                    {(user.role ?? "").toUpperCase() === "ADMIN" && (
+                      <DropdownMenuItem
+                        onClick={() => navigate('/dashboard')}
+                        className="cursor-pointer"
+                      >
+                        <span>Dashboard</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => {
@@ -371,16 +339,26 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button
-                  size="sm"
-                  className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-                  onClick={(e: { preventDefault: () => void }) => {
-                    e.preventDefault();
-                    if (onSignInClick) onSignInClick();
-                  }}
-                >
-                  {signInText}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
+                    onClick={() => navigate('/register')}
+                  >
+                    Sign up
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
+                    onClick={(e: { preventDefault: () => void }) => {
+                      e.preventDefault();
+                      if (onSignInClick) onSignInClick();
+                    }}
+                  >
+                    {signInText}
+                  </Button>
+                </div>
               )}
             </div>
           )}
@@ -392,4 +370,4 @@ export const Navbar04 = React.forwardRef<HTMLElement, Navbar04Props>(
 
 Navbar04.displayName = "Navbar04";
 
-export { Logo, HamburgerIcon };
+export {  HamburgerIcon };

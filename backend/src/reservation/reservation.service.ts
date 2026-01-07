@@ -142,6 +142,21 @@ export class ReservationService {
     }
 
     reservation.status = dto.status as ReservationStatus;
+
+    // If reservation is approved by admin, mark the associated vehicle as "Loué"
+    if ((dto.status ?? '').toUpperCase() === 'APPROVED') {
+      try {
+        const vehicle = await this.vehicleRepository.findOne({ where: { id: reservation.vehicleId } });
+        if (vehicle) {
+          vehicle.etat = 'Loué';
+          await this.vehicleRepository.save(vehicle);
+        }
+      } catch (err) {
+        // Log and continue - reservation status should still be updated
+        console.error('Failed to update vehicle status when approving reservation', err);
+      }
+    }
+
     return this.reservationRepository.save(reservation);
   }
 
