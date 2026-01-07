@@ -27,7 +27,7 @@ function AppContent() {
 
   const baseNavigationLinks = [{ href: "/cars", label: "Voitures" }];
   const navigationLinks = user && (user.role ?? "").toUpperCase() === "ADMIN"
-    ? [...baseNavigationLinks, { href: "/dashboard", label: "Dashboard" }]
+    ? [{ href: "/dashboard", label: "Dashboard" }, ...baseNavigationLinks]
     : baseNavigationLinks;
 
   return (

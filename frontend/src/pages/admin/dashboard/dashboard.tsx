@@ -62,6 +62,31 @@ function Dashboard() {
 
   const [pendingReservations, setPendingReservations] = useState<ReservationItem[]>([]);
   const [reservationsLoading, setReservationsLoading] = useState(false);
+
+  // Maintenance admin
+  interface MaintenanceItem {
+    id: number;
+    description: string;
+    date: string;
+    cost: number;
+    vehicleId: number;
+    vehicle: { id: number; marque: string; modele: string; immatriculation: string };
+    createdAt: string;
+  }
+
+  const [maintenances, setMaintenances] = useState<MaintenanceItem[]>([]);
+  const [maintenancesLoading, setMaintenancesLoading] = useState(false);
+  const [selectedVehicleForMaintenance, setSelectedVehicleForMaintenance] = useState<number | null>(null);
+  const [showMaintenanceForm, setShowMaintenanceForm] = useState(false);
+  const [editingMaintenanceId, setEditingMaintenanceId] = useState<number | null>(null);
+  const [newMaintenance, setNewMaintenance] = useState<Partial<MaintenanceItem>>({
+    description: "",
+    date: new Date().toISOString().split('T')[0],
+    cost: 0,
+    vehicleId: undefined,
+  });
+  const [creatingMaintenance, setCreatingMaintenance] = useState(false);
+
   useEffect(() => {
     // Wait until auth initialization finishes before redirecting
     if (isLoading) return;
@@ -80,6 +105,7 @@ function Dashboard() {
     fetchUsers();
     fetchVehicles();
     fetchPendingReservations();
+    fetchMaintenances();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isLoading]);
 
@@ -162,6 +188,82 @@ function Dashboard() {
     } catch (err) {
       console.error('Error rejecting reservation', err);
       toast.error('Impossible de refuser la réservation');
+    }
+  };
+
+  const fetchMaintenances = async () => {
+    try {
+      setMaintenancesLoading(true);
+      const resp = await api.get('/maintenance?page=1&limit=100');
+      const data = Array.isArray(resp.data) ? resp.data : resp.data?.data ?? [];
+      setMaintenances(data);
+    } catch (err) {
+      console.error('Error fetching maintenances', err);
+      toast.error('Impossible de charger les maintenances');
+    } finally {
+      setMaintenancesLoading(false);
+    }
+  };
+
+  const createMaintenance = async () => {
+    if (!newMaintenance.description || !newMaintenance.date || !newMaintenance.cost || !newMaintenance.vehicleId) {
+      toast.error('Veuillez remplir tous les champs requis');
+      return;
+    }
+
+    try {
+      setCreatingMaintenance(true);
+      const payload = {
+        description: newMaintenance.description,
+        date: newMaintenance.date,
+        cost: Number(newMaintenance.cost),
+        vehicleId: newMaintenance.vehicleId,
+      };
+      await api.post('/maintenance', payload);
+      toast.success('Maintenance créée');
+      setShowMaintenanceForm(false);
+      setNewMaintenance({
+        description: "",
+        date: new Date().toISOString().split('T')[0],
+        cost: 0,
+        vehicleId: undefined,
+      });
+      fetchMaintenances();
+    } catch (err) {
+      console.error('Error creating maintenance', err);
+      toast.error('Impossible de créer la maintenance');
+    } finally {
+      setCreatingMaintenance(false);
+    }
+  };
+
+  const updateMaintenance = async (id: number, updates: Partial<MaintenanceItem>) => {
+    try {
+      const payload = {
+        ...(updates.description && { description: updates.description }),
+        ...(updates.date && { date: updates.date }),
+        ...(updates.cost !== undefined && { cost: Number(updates.cost) }),
+        ...(updates.vehicleId && { vehicleId: updates.vehicleId }),
+      };
+      await api.patch(`/maintenance/${id}`, payload);
+      toast.success('Maintenance mise à jour');
+      setEditingMaintenanceId(null);
+      fetchMaintenances();
+    } catch (err) {
+      console.error('Error updating maintenance', err);
+      toast.error('Impossible de mettre à jour la maintenance');
+    }
+  };
+
+  const deleteMaintenance = async (id: number) => {
+    if (!confirm('Voulez-vous vraiment supprimer cette maintenance ?')) return;
+    try {
+      await api.delete(`/maintenance/${id}`);
+      toast.success('Maintenance supprimée');
+      fetchMaintenances();
+    } catch (err) {
+      console.error('Error deleting maintenance', err);
+      toast.error('Impossible de supprimer la maintenance');
     }
   };
 
@@ -390,6 +492,206 @@ function Dashboard() {
                     <tr>
                       <td colSpan={7} className="px-4 py-6 text-center text-sm text-muted-foreground">
                         Aucun véhicule trouvé
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Maintenance section for admin */}
+        <div className="mt-10">
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Gestion des maintenances</p>
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={() => setShowMaintenanceForm((s) => !s)}>
+                {showMaintenanceForm ? "Annuler" : "Ajouter une maintenance"}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => fetchMaintenances()}>Refresh</Button>
+            </div>
+          </div>
+
+          {showMaintenanceForm && (
+            <div className="mb-6 p-4 bg-card border rounded-md">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium block mb-2">Véhicule</label>
+                  <select
+                    className="w-full p-2 rounded border"
+                    value={newMaintenance.vehicleId ?? ""}
+                    onChange={(e) => setNewMaintenance({ ...newMaintenance, vehicleId: Number(e.target.value) })}
+                  >
+                    <option value="">Sélectionner un véhicule</option>
+                    {vehicles.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.marque} {v.modele} ({v.immatriculation})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium block mb-2">Date</label>
+                  <input
+                    type="date"
+                    className="w-full p-2 rounded border"
+                    value={newMaintenance.date ?? ""}
+                    onChange={(e) => setNewMaintenance({ ...newMaintenance, date: e.target.value })}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium block mb-2">Coût (€)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="w-full p-2 rounded border"
+                    placeholder="0.00"
+                    value={newMaintenance.cost ?? ""}
+                    onChange={(e) => setNewMaintenance({ ...newMaintenance, cost: Number(e.target.value) })}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium block mb-2">Description</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 rounded border"
+                    placeholder="Ex: Révision, changement pneus..."
+                    value={newMaintenance.description ?? ""}
+                    onChange={(e) => setNewMaintenance({ ...newMaintenance, description: e.target.value })}
+                  />
+                </div>
+
+                <div className="col-span-1 md:col-span-2 flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={createMaintenance}
+                    disabled={creatingMaintenance}
+                  >
+                    {creatingMaintenance ? 'Création...' : 'Créer maintenance'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {maintenancesLoading ? (
+            <div className="text-center py-10">Chargement...</div>
+          ) : (
+            <div className="overflow-x-auto bg-card border rounded-lg">
+              <table className="min-w-full divide-y table-auto">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-sm font-medium">#</th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">Véhicule</th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">Description</th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">Date</th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">Coût</th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-background divide-y">
+                  {maintenances.map((m) => (
+                    <tr key={m.id}>
+                      <td className="px-4 py-3 text-sm">{m.id}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <div>{m.vehicle.marque} {m.vehicle.modele}</div>
+                        <div className="text-xs text-muted-foreground">{m.vehicle.immatriculation}</div>
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {editingMaintenanceId === m.id ? (
+                          <input
+                            type="text"
+                            className="w-full p-1 rounded border text-xs"
+                            value={m.description}
+                            onChange={(e) => setMaintenances(prev =>
+                              prev.map(item => item.id === m.id ? { ...item, description: e.target.value } : item)
+                            )}
+                          />
+                        ) : (
+                          m.description
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {editingMaintenanceId === m.id ? (
+                          <input
+                            type="date"
+                            className="p-1 rounded border text-xs"
+                            value={m.date.split('T')[0]}
+                            onChange={(e) => setMaintenances(prev =>
+                              prev.map(item => item.id === m.id ? { ...item, date: e.target.value } : item)
+                            )}
+                          />
+                        ) : (
+                          new Date(m.date).toLocaleDateString()
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {editingMaintenanceId === m.id ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            className="w-20 p-1 rounded border text-xs"
+                            value={m.cost}
+                            onChange={(e) => setMaintenances(prev =>
+                              prev.map(item => item.id === m.id ? { ...item, cost: Number(e.target.value) } : item)
+                            )}
+                          />
+                        ) : (
+                          `${Number(m.cost).toFixed(2)} €`
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          {editingMaintenanceId === m.id ? (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => updateMaintenance(m.id, {
+                                  description: m.description,
+                                  date: m.date,
+                                  cost: m.cost,
+                                })}
+                              >
+                                Valider
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setEditingMaintenanceId(null)}
+                              >
+                                Annuler
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setEditingMaintenanceId(m.id)}
+                              >
+                                Éditer
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => deleteMaintenance(m.id)}
+                              >
+                                Supprimer
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {maintenances.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-6 text-center text-sm text-muted-foreground">
+                        Aucune maintenance enregistrée
                       </td>
                     </tr>
                   )}
