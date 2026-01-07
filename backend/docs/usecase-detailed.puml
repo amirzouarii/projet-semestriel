@@ -1,0 +1,92 @@
+@startuml usecase-detailed
+' Detailed Use Case Diagram - Main Features and Interactions
+
+!define ACTOR_BG #E1F5FF
+!define UC_BG #FFF9C4
+!define SYSTEM_BG #F0F4C3
+
+skinparam backgroundColor #FEFEFE
+skinparam actor {
+    BackgroundColor ACTOR_BG
+    BorderColor #0288D1
+}
+skinparam rectangle {
+    BackgroundColor SYSTEM_BG
+    BorderColor #558B2F
+}
+skinparam usecase {
+    BackgroundColor UC_BG
+    BorderColor #F57F17
+}
+
+actor "Guest" as Guest
+actor "User" as User
+actor "Admin" as Admin
+
+rectangle "Système de Location" {
+
+    ' ============ AUTHENTIFICATION ============
+    usecase "Register" as UC_Register
+    usecase "Login" as UC_Login
+
+    ' ============ MAIN FEATURES ============
+    usecase "Browse & Search\nVehicles" as UC_BrowseSearch
+    usecase "View Vehicle\nDetails" as UC_ViewDetails
+
+    usecase "Create\nReservation" as UC_CreateRes
+    usecase "View Own\nReservations" as UC_ViewRes
+    usecase "Cancel\nReservation" as UC_CancelRes
+
+    usecase "Create &\nComplete Payment" as UC_Payment
+
+    usecase "Write & View\nReviews" as UC_Reviews
+
+    ' ADMIN SPECIFIC
+    usecase "Manage Vehicles\n(Create/Update/Delete)" as UC_ManageVehicles
+    usecase "Manage All\nReservations" as UC_ManageRes
+    usecase "Manage All\nPayments" as UC_ManagePayments
+    usecase "Verify Reviews\n& Approve" as UC_VerifyReviews
+    usecase "Manage Vehicle\nMaintenance" as UC_Maintenance
+
+}
+
+' ============ GUEST FLOW ============
+Guest --> UC_Register
+Guest --> UC_Login
+Guest --> UC_BrowseSearch
+Guest --> UC_ViewDetails
+
+' ============ USER FLOW ============
+User --> UC_Login
+User --> UC_BrowseSearch
+User --> UC_ViewDetails
+User --> UC_CreateRes
+User --> UC_ViewRes
+User --> UC_CancelRes
+User --> UC_Payment
+User --> UC_Reviews
+
+' ============ ADMIN FLOW ============
+Admin --> UC_Login
+Admin --> UC_ManageVehicles
+Admin --> UC_ManageRes
+Admin --> UC_ManagePayments
+Admin --> UC_VerifyReviews
+Admin --> UC_Maintenance
+
+' ============ DEPENDENCIES ============
+UC_CreateRes ---|> UC_ViewDetails : requires vehicle
+UC_CancelRes ---|> UC_ViewRes : cancels
+
+UC_Payment ..|> UC_CreateRes : payment for
+UC_Payment ..> UC_ManageRes : triggers approval
+UC_ManageRes ..> UC_ManagePayments : updates status
+
+UC_Reviews ---|> UC_ViewDetails : about vehicle
+UC_VerifyReviews ..> UC_Reviews : verifies
+
+UC_ManageVehicles --> UC_Maintenance : may trigger
+
+UC_Login ..> UC_Register : follows
+
+@enduml

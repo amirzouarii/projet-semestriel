@@ -1,0 +1,596 @@
+\documentclass[a4paper,12pt]{report}
+
+% --- PACKAGES ESSENTIELS ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel} % Langue française
+\usepackage{geometry} % Marges
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+\usepackage{graphicx} % Images
+\usepackage{float} % Placement des images (H)
+\usepackage{hyperref} % Liens cliquables
+\usepackage{enumitem} % Personnalisation des listes
+\usepackage{titlesec} % Style des titres
+
+% --- CONFIGURATION DU CODE (Pour le Chapitre 5) ---
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinelanguage{TypeScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, const, let, async, await, export, class, interface, implements, extends, public, private, protected, readonly, constructor},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{codepurple}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{codegreen}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single
+}
+\lstset{style=mystyle}
+
+% --- SETUP LIENS ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black, % Noir pour la TOC
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=blue,
+    pdftitle={Rapport Projet Location Véhicules},
+}
+
+
+
+% ================= DEBUT DU DOCUMENT =================
+\begin{document}
+
+% -------- PAGE DE GARDE --------
+\begin{titlepage}
+    \centering
+    % LOGO POLYTECHNIQUE SOUSSE
+    \includegraphics[width=0.35\textwidth]{logo.png}
+    \vspace{1cm}
+    
+    \Large
+    \textbf{Université Polytechnique Sousse} \\
+    \textbf{Année Universitaire 2025–2026} \\
+    \textbf{5\textsuperscript{ème} année Génie Logiciel} \\
+    \vspace{2.5cm}
+    
+    \Huge
+    \textbf{Gestion d’agence de location de véhicules} \\
+    \vspace{0.5cm}
+    \LARGE
+    Rapport de Projet \\
+    \vspace{2.5cm}
+    
+    \large
+    \begin{tabular}{ll}
+        \textbf{Réalisé par :} & \textbf{Amir ZOUARI} \\
+                               & \textbf{Zied HARZALLAH} \\
+        & \\
+        \textbf{Classe :} & 5\textsuperscript{ème} année Génie Logiciel \\
+        & \\
+        \textbf{Encadrant :} & M. Haithem SAOUDI\\
+    \end{tabular}
+    
+    \vfill
+    \today
+\end{titlepage}
+
+% -------- SOMMAIRE --------
+\tableofcontents
+\newpage
+
+% -------- CHAPITRES --------
+
+%------Chapitre 1--------------
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+\section*{Présentation du sujet, des objectifs et du contexte}
+
+\textbf{Présentation du sujet :} \\
+Le projet consiste à concevoir et développer une application de gestion pour une agence de location de véhicules. Cette application vise à centraliser toutes les opérations courantes de l’agence, telles que la gestion du catalogue de voitures, le suivi des réservations et le contrôle de l’état de la flotte. L’objectif principal est de faciliter le travail des employés, améliorer la qualité du service pour les clients et optimiser la gestion des véhicules disponibles.
+
+\textbf{Objectifs du projet :} \\
+Les objectifs spécifiques de ce projet sont les suivants : 
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Gestion du catalogue de voitures :} Permettre l’ajout, la modification et la suppression de véhicules dans le catalogue, avec des informations détaillées telles que la marque, le modèle, l’année, le prix de location et l’état du véhicule.
+    \item \textbf{Gestion des réservations :} Suivre les réservations des clients, vérifier la disponibilité des véhicules et générer des confirmations automatiques.
+    \item \textbf{Suivi de la flotte :} Maintenir un historique des véhicules loués, suivre leur état, planifier les entretiens et détecter les problèmes éventuels.
+    \item \textbf{Amélioration de l’expérience client :} Offrir une interface simple et intuitive pour la consultation des véhicules disponibles et la réservation en ligne.
+\end{itemize}
+
+\textbf{Contexte du projet :} \\
+Dans un marché de plus en plus compétitif, les agences de location de véhicules doivent répondre rapidement aux demandes des clients et gérer efficacement leur flotte. Les solutions traditionnelles basées sur des registres papier ou des fichiers Excel présentent des limites en termes de fiabilité et de rapidité. Ce projet s’inscrit donc dans le contexte de la digitalisation des services, avec l’objectif de fournir une application moderne et performante qui centralise toutes les informations et facilite la gestion quotidienne de l’agence.
+
+
+%-----Chapitre 2----------
+
+\chapter{Analyse et Spécification des Besoins}
+
+\section{Acteurs}
+Le système de gestion de location de véhicules comporte plusieurs acteurs principaux :
+
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Guest / Visiteur} : Un utilisateur non authentifié qui peut consulter les véhicules, effectuer une recherche et s'inscrire.
+    \item \textbf{Administrateur (ADMIN)} : Responsable de la gestion complète de l'application. Il peut créer, modifier et supprimer des véhicules, gérer les réservations, suivre la maintenance et vérifier les avis des utilisateurs.
+    \item \textbf{Utilisateur / Client (USER)} : Peut consulter le catalogue des véhicules, effectuer des réservations, payer ses réservations et laisser des avis sur les véhicules loués.
+    \item \textbf{Système de paiement} : Module automatisé qui gère la validation des paiements et met à jour le statut des réservations.
+\end{itemize}
+
+\section{Diagrammes de Cas d'Utilisation}
+
+Les diagrammes de cas d'utilisation illustrent les interactions entre les acteurs et le système. Ils permettent de visualiser les principales fonctionnalités accessibles à chaque type d'utilisateur. Le système gère trois types d'acteurs distincts avec des permissions différentes : les visiteurs (guests), les clients authentifiés (users) et les administrateurs.
+
+\subsection{Diagramme Global de Cas d'Utilisation}
+
+Le diagramme suivant présente une vue d'ensemble complète de tous les cas d'utilisation du système. Il illustre comment chaque acteur interagit avec les différentes fonctionnalités du système, organisées autour des opérations principales : authentification, gestion des véhicules, réservations, paiements, avis et maintenance. Ce diagramme offre une vision globale des interactions du système.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{usecase/global_use_case.png}
+    \caption{Diagramme global de cas d'utilisation du système de gestion de location}
+    \label{fig:usecase-global}
+\end{figure}
+
+\subsection{Diagrammes de Cas d'Utilisation par Acteur}
+
+Pour une meilleure compréhension des responsabilités de chaque type d'utilisateur, nous présentons les diagrammes de cas d'utilisation spécifiques à chaque acteur. Chaque diagramme détaille les actions que l'acteur peut effectuer dans le système.
+
+\subsubsection{Diagramme de Cas d'Utilisation - Visiteur (Guest)}
+
+Le visiteur (guest) est un utilisateur non authentifié. Il a accès aux fonctionnalités de consultation sans restriction d'authentification. Il peut découvrir les véhicules disponibles, consulter les avis des autres utilisateurs, et créer un compte.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{usecase/visiteur.png}
+    \caption{Diagramme de cas d'utilisation - Visiteur (Guest)}
+    \label{fig:usecase-guest}
+\end{figure}
+
+\subsubsection{Diagramme de Cas d'Utilisation - Client (User)}
+
+Un client authentifié hérite de tous les droits du visiteur et dispose de fonctionnalités supplémentaires. Il peut créer des réservations, effectuer des paiements, et écrire des avis sur les véhicules qu'il a loués. Le client peut également consulter son historique de réservations et de paiements.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{usecase/client_use_case.png}
+    \caption{Diagramme de cas d'utilisation - Client (User)}
+    \label{fig:usecase-client}
+\end{figure}
+
+\subsubsection{Diagramme de Cas d'Utilisation - Administrateur (Admin)}
+
+L'administrateur dispose de tous les droits du système. En plus des fonctionnalités accessibles aux clients, il peut gérer complètement le catalogue des véhicules (créer, modifier, supprimer), approuver ou rejeter les réservations, vérifier les avis, et gérer la maintenance de la flotte.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{usecase/admin_use_case.png}
+    \caption{Diagramme de cas d'utilisation - Administrateur (Admin)}
+    \label{fig:usecase-admin}
+\end{figure}
+
+\subsection{Description des Cas d'Utilisation Principaux}
+
+\subsubsection{Cas d'Utilisation du Visiteur (Guest)}
+
+Le visiteur non authentifié a accès aux fonctionnalités de base du système :
+
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Consulter les voitures :} Le visiteur peut parcourir le catalogue complet des véhicules disponibles avec pagination et filtres (marque, modèle, état, prix).
+    \item \textbf{Créer un compte :} Le visiteur peut s'inscrire en fournissant ses informations personnelles. Le système valide les entrées, hache le mot de passe et crée le compte avec le rôle USER.
+    \item \textbf{Se connecter :} Le visiteur utilise ses identifiants (email/mot de passe) pour se connecter au système et accéder aux fonctionnalités client.
+\end{itemize}
+
+\subsubsection{Cas d'Utilisation du Client (User)}
+
+Le client authentifié hérite de tous les droits du visiteur et dispose de fonctionnalités supplémentaires pour les réservations et la gestion de profil :
+
+\paragraph{Réservations}
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Réserver des voitures :} Le client peut créer une nouvelle réservation pour un véhicule.
+    \item \textbf{Effectuer la réservation :} Finaliser les détails de la réservation (dates, véhicule, prix calculé automatiquement).
+    \item \textbf{Payer la réservation :} Effectuer le paiement associé à la réservation.
+    \item \textbf{Consulter ses réservations :} Voir l'historique complète de ses réservations avec leurs statuts.
+    \item \textbf{Annuler la réservation :} Annuler une réservation en attente.
+\end{itemize}
+
+\paragraph{Profil}
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Gérer profil :} Accéder et modifier son profil utilisateur.
+    \item \textbf{Changer nom :} Modifier le nom enregistré dans le compte.
+    \item \textbf{Changer mot de passe :} Mettre à jour le mot de passe du compte.
+\end{itemize}
+
+\subsubsection{Cas d'Utilisation de l'Administrateur (Admin)}
+
+L'administrateur dispose de tous les droits du système et peut gérer les aspects critiques de l'application :
+
+\paragraph{Gestion Parc Automobile}
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Gérer les voitures :} Accéder à la gestion complète du catalogue.
+    \item \textbf{Ajouter une voiture :} Créer une nouvelle entrée de véhicule avec tous les détails (marque, modèle, état, prix journalier, images).
+    \item \textbf{Modifier une voiture :} Mettre à jour les informations d'un véhicule existant.
+    \item \textbf{Supprimer une voiture :} Retirer un véhicule du catalogue.
+    \item \textbf{Voir une voiture :} Consulter les détails complets d'un véhicule.
+\end{itemize}
+
+\paragraph{Gestion Utilisateurs}
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Gérer les comptes clients :} Accéder à la gestion complète des comptes utilisateurs.
+    \item \textbf{Ajouter un client :} Créer un nouveau compte client manuellement.
+    \item \textbf{Modifier un client :} Mettre à jour les informations d'un compte utilisateur.
+    \item \textbf{Supprimer un client :} Retirer un compte utilisateur du système.
+    \item \textbf{Voir un client :} Consulter les détails complets d'un compte utilisateur.
+\end{itemize}
+
+\paragraph{Gestion Réservations}
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Gérer les réservations :} Accéder à la gestion globale des réservations.
+    \item \textbf{Voir les réservations :} Consulter toutes les réservations du système avec filtres optionnels.
+\end{itemize}
+
+\section{Besoins Fonctionnels}
+Les besoins fonctionnels décrivent les actions que le système doit être capable d’exécuter :
+
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Gestion des utilisateurs :} Authentification et inscription sécurisées avec JWT, gestion des rôles (ADMIN/USER), consultation du profil.
+    \item \textbf{Gestion des véhicules :} Ajouter, modifier, supprimer et consulter des véhicules, avec recherche et filtrage par marque, état, prix, etc.
+    \item \textbf{Gestion des réservations :} Créer, consulter, modifier et annuler les réservations, avec détection des conflits et calcul automatique du prix.
+    \item \textbf{Paiement :} Enregistrer et suivre les paiements (CASH, CARD, BANK\_TRANSFER), mise à jour automatique du statut de la réservation après paiement.
+    \item \textbf{Avis / Reviews :} Les utilisateurs peuvent évaluer les véhicules loués et laisser des commentaires ; l'administrateur peut vérifier et approuver les avis.
+    \item \textbf{Maintenance :} Suivi de l’historique des véhicules, enregistrement des coûts et interventions.
+\end{itemize}
+
+\section{Besoins Non Fonctionnels}
+Les besoins non fonctionnels définissent les contraintes et qualités que le système doit respecter :
+
+\begin{itemize}[label=\textbullet]
+    \item \textbf{Sécurité :} Protection des données sensibles (hashing des mots de passe, JWT pour l’authentification, prévention des injections SQL).
+    \item \textbf{Performance :} Réponses rapides pour la consultation des véhicules et la gestion des réservations.
+    \item \textbf{Fiabilité :} Détection des conflits de réservation et intégrité des données.
+    \item \textbf{Scalabilité :} Capacité à gérer un grand nombre d’utilisateurs et de véhicules.
+    \item \textbf{Maintenabilité :} Code structuré avec modules et TypeORM pour faciliter les mises à jour.
+\end{itemize}
+
+
+%---chapitre3------------
+
+\chapter{Conception Technique et Architecture}
+
+\section{Conception Détaillée}
+
+La conception détaillée du système est représentée par des diagrammes UML qui permettent de visualiser les entités, leurs relations et les interactions principales du système.
+
+\subsection{Diagramme de Classes}
+Le diagramme de classes représente l’ensemble des entités du domaine, leurs attributs, et les relations qui les lient (associations, héritage, etc.). Il permet de comprendre la structure des données et les dépendances entre les objets.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{diagclasse.png}
+    \caption{Diagramme de classes du système de gestion de location}
+    \label{fig:class-diagram}
+\end{figure}
+
+\subsection{Description du diagramme de classes}
+Ce diagramme de classes UML présente la structure d'un système de gestion de location/réservation de voitures, en décrivant les principales entités et leurs relations. Il met en évidence six classes : \textit{User}, \textit{Voiture}, \textit{Reservation}, \textit{Maintenance}, \textit{Payment} et \textit{Facture}.
+
+L'utilisateur (\textit{User}) peut effectuer des réservations (\textit{Reservation}), lesquelles sont associées à une voiture (\textit{Voiture}) sur une période donnée (\textit{startDate}, \textit{endDate}) avec un prix total et un statut de suivi. Les véhicules peuvent faire l'objet de maintenances programmées, et les réservations génèrent des paiements et des factures.
+
+\subsection{Diagrammes de Séquence}
+Les diagrammes de séquence illustrent les interactions entre objets pour les scénarios clés du système.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{./sequence/seq_register.png}
+    \caption{Diagramme de séquence : validation et inscription d'un utilisateur}
+    \label{fig:auth-sequence}
+\end{figure}
+
+Ce diagramme montre le flux complet d'enregistrement d'un nouvel utilisateur : le client envoie ses identifiants, le système les valide via le AuthService, vérifie si l'utilisateur existe déjà dans la base de données, hache le mot de passe via HashingService, et enfin crée l'utilisateur avec génération d'un JWT.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{./sequence/seq_login.png}
+    \caption{Diagramme de séquence : authentification et connexion d'un utilisateur}
+    \label{fig:login-sequence}
+\end{figure}
+
+Ce diagramme illustre le processus de connexion d'un utilisateur existant. Le client transmet ses identifiants (email et mot de passe) au serveur. Le système AuthService valide les données via DTO, recherche l'utilisateur dans la base de données par son email, compare le mot de passe fourni avec le mot de passe haché stocké via HashingService. En cas de succès, le JwtService génère un JWT contenant les informations de l'utilisateur (ID, nom, rôle), qui est retourné au client pour les requêtes ultérieures.
+
+\section{Architecture Logicielle et Physique}
+
+\subsection{Architecture Logique}
+L’architecture logique présente l’organisation en couches de l’application, qui facilite la maintenance et la réutilisabilité :
+
+\begin{itemize}
+    \item \textbf{Couche Présentation / Frontend :} Interface utilisateur React/Vite, affichage des informations et interaction avec l'API REST.
+    \item \textbf{Couche Métier / Service :} Contient la logique applicative, le traitement des données et les règles métier (NestJS Services).
+    \item \textbf{Couche Accès aux données / DAO :} Communication avec la base de données PostgreSQL via TypeORM.
+    \item \textbf{API REST :} Permet l’échange d’informations entre le frontend et le backend.
+\end{itemize}
+
+\subsection{Architecture Physique}
+L’architecture physique illustre le déploiement des composants du système.
+Les flux principaux sont : 
+\begin{itemize}
+    \item Le client envoie des requêtes HTTP/REST vers le serveur web / frontend.
+    \item Le serveur web transmet les requêtes à l’application backend (NestJS) qui gère la logique métier.
+    \item L’application backend interagit avec la base de données PostgreSQL via TypeORM.
+\end{itemize}
+
+%------chapitre4------
+
+\chapter{Détails Techniques (Architecture)}
+
+\section{Décomposition Modulaire}
+L’application est une API REST développée avec \textbf{NestJS} et \textbf{TypeScript}, structurée en modules fonctionnels.
+
+\subsection{Découpage en modules}
+\begin{itemize}
+    \item \textbf{Auth} : Gestion de l’authentification (JWT, bcrypt).
+    \item \textbf{Vehicle / Voiture} : CRUD des véhicules, recherche, filtres.
+    \item \textbf{Reservation} : Création, détection de conflits, calcul prix.
+    \item \textbf{Payment} : Suivi des paiements, validation.
+    \item \textbf{User} : Gestion des profils.
+    \item \textbf{Maintenance} : Suivi de l'historique et coûts.
+    \item \textbf{Review} : Gestion des avis utilisateurs.
+\end{itemize}
+
+\subsection{Couche persistance}
+La persistance est assurée par \textbf{PostgreSQL} via \textbf{TypeORM}. Les entités modélisent les relations (OneToMany, ManyToOne) et permettent une cohérence forte des données.
+
+%------chapitre5 (IMPROVED)------
+
+\chapter{Réalisation et Implémentation}
+
+\section{Environnement de Développement}
+Pour implémenter cette solution, nous avons utilisé un environnement technique moderne et robuste :
+\begin{itemize}
+    \item \textbf{Langage :} TypeScript.
+    \item \textbf{Framework Backend :} NestJS (Architecture modulaire).
+    \item \textbf{Framework Frontend :} React avec Vite et Shadcn/UI.
+    \item \textbf{Base de Données :} PostgreSQL (SGBDR).
+    \item \textbf{ORM :} TypeORM (Abstraction de la base de données).
+    \item \textbf{Authentification :} JWT (JSON Web Tokens).
+    \item \textbf{Outils de Test :} Postman (Tests API), Swagger (Documentation).
+    \item \textbf{Containerisation :} Docker (docker-compose).
+\end{itemize}
+
+\section{Implémentation des Modules Clés}
+
+\subsection{Définition des Entités (TypeORM)}
+La structure de la base de données est définie via des classes TypeScript décorées. Voici l'entité \texttt{Vehicules} réelle du projet :
+
+\begin{lstlisting}[language=TypeScript, caption=Entité Vehicules.entity.ts]
+@Entity()
+export class Vehicules {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'varchar', length: 100 })
+  marque: string;
+
+  @Column({ type: 'varchar', length: 100 })
+  modele: string;
+
+  @Column({ type: 'varchar', length: 50, unique: true })
+  immatriculation: string;
+
+  @Column({ type: 'varchar', length: 50 })
+  etat: string; // disponible, en-maintenance, réservé
+
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
+  prixJour: number;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  image: string;
+
+  @OneToMany(() => Reservation, (reservation) => reservation.vehicle)
+  reservations: Reservation[];
+
+  @OneToMany(() => Maintenance, (maintenance) => maintenance.vehicle)
+  maintenances: Maintenance[];
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt: Date;
+}
+\end{lstlisting}
+
+Cette entité représente un véhicule du parc automobile. Elle contient les informations essentielles : marque, modèle, immatriculation (unique pour chaque véhicule), état, prix journalier, et image. Les relations OneToMany permettent de lier les réservations et la maintenance historique à chaque véhicule.
+
+\subsection{Logique de Réservation et Détection de Conflits}
+Le défi principal technique était d'empêcher le \og double-booking \fg{} (deux réservations pour la même voiture en même temps). Cette logique est implémentée dans le \texttt{ReservationService} :
+
+\begin{lstlisting}[language=TypeScript, caption=Vérification de disponibilité et création de réservation (ReservationService)]
+async create(dto: CreateReservationDto, currentUser: TokenPayload) {
+  const startDate = new Date(dto.startDate);
+  const endDate = new Date(dto.endDate);
+  this.assertDateRange(startDate, endDate);
+
+  const targetUserId = dto.userId ?? currentUser.userId;
+
+  if (currentUser.role !== 'ADMIN' && targetUserId !== currentUser.userId) {
+    throw new ForbiddenException(
+      'Cannot create reservations for other users'
+    );
+  }
+
+  const [vehicle, user] = await Promise.all([
+    this.vehicleRepository.findOne({ where: { id: dto.vehicleId } }),
+    this.userRepository.findOne({ where: { id: targetUserId } }),
+  ]);
+
+  // Vérification de l'existence du véhicule et de l'utilisateur
+  if (!vehicle || !user) {
+    throw new NotFoundException('Vehicle or user not found');
+  }
+
+  // Détection des conflits de dates avec QueryBuilder
+  const conflictCount = await this.reservationRepository
+    .createQueryBuilder('reservation')
+    .where('reservation.vehicleId = :vehicleId', { vehicleId: dto.vehicleId })
+    .andWhere('reservation.status IN (:...statuses)', {
+      statuses: ['PENDING', 'APPROVED'],
+    })
+    .andWhere('reservation.startDate < :endDate', { endDate })
+    .andWhere('reservation.endDate > :startDate', { startDate })
+    .getCount();
+
+  if (conflictCount > 0) {
+    throw new BadRequestException(
+      'Vehicle already reserved for the selected date range'
+    );
+  }
+
+  const totalPrice = this.computePrice(
+    startDate, 
+    endDate, 
+    Number(vehicle.prixJour)
+  );
+
+  const reservation = this.reservationRepository.create({
+    ...dto,
+    userId: targetUserId,
+    totalPrice,
+    status: 'PENDING',
+  });
+
+  return this.reservationRepository.save(reservation);
+}
+
+private computePrice(
+  startDate: Date, 
+  endDate: Date, 
+  dailyRate: number
+) {
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const durationDays = Math.ceil(
+    (endDate.getTime() - startDate.getTime()) / msPerDay
+  );
+
+  if (durationDays <= 0) {
+    throw new BadRequestException('Reservation duration must be positive');
+  }
+
+  return durationDays * Number(dailyRate);
+}
+\end{lstlisting}
+
+Ce code démontre l'utilisation avancée de TypeORM avec \texttt{QueryBuilder} pour déterminer les conflits. Le système vérifie que la période demandée n'entre pas en conflit avec les réservations existantes (statut PENDING ou APPROVED). Le calcul du prix total est automatique, basé sur le nombre de jours et le tarif journalier du véhicule.
+
+\subsection{Contrôleurs et Sécurisation des Endpoints}
+Les contrôleurs exposent les routes REST et appliquent les contrôles d'accès basés sur les rôles via le décorateur \texttt{@Roles}. Voici l'implémentation du \texttt{ReservationController} :
+
+\begin{lstlisting}[language=TypeScript, caption=Endpoints sécurisés (ReservationController)]
+@Controller('reservations')
+export class ReservationController {
+  constructor(private readonly reservationService: ReservationService) {}
+
+  @Post()
+  @Roles('ADMIN', 'USER')
+  create(
+    @Body() dto: CreateReservationDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.reservationService.create(dto, req.user);
+  }
+
+  @Get()
+  @Roles('ADMIN', 'USER')
+  list(
+    @Query() query: ReservationQueryDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.reservationService.list(query, req.user);
+  }
+
+  @Patch(':id/status')
+  @Roles('ADMIN')
+  updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateReservationStatusDto,
+  ) {
+    return this.reservationService.updateStatus(id, dto);
+  }
+
+  @Patch(':id/cancel')
+  @Roles('ADMIN', 'USER')
+  cancel(
+    @Param('id', ParseIntPipe) id: number, 
+    @Req() req: RequestWithUser
+  ) {
+    return this.reservationService.cancel(id, req.user);
+  }
+}
+\end{lstlisting}
+
+Ces endpoints sécurisés illustrent comment les rôles (ADMIN/USER) sont appliqués. L'endpoint \texttt{POST /reservations} crée une réservation (accessible aux clients authentifiés), tandis que \texttt{PATCH /reservations/:id/status} permet seulement aux administrateurs de changer le statut d'une réservation. Le système utilise le contexte de l'utilisateur (extrait du JWT) pour appliquer les restrictions appropriées.
+
+\section{Documentation API (Swagger)}
+Afin de faciliter l'intégration avec le Frontend, nous avons généré une documentation automatique via Swagger. Cela permet de visualiser tous les endpoints disponibles, les paramètres requis et les réponses attendues.
+
+%-----Conclusion----------
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+\section*{Bilan et Perspectives}
+Ce projet a permis de concevoir et de réaliser une API REST complète de gestion de location de véhicules, intégrant l'authentification JWT, le contrôle d'accès par rôles (ADMIN/USER), la gestion des véhicules, des réservations, des paiements et de la maintenance.
+
+\subsection*{Bilan du projet}
+Les fonctionnalités développées couvrent l'ensemble du cycle métier : consultation des véhicules, réservation sécurisée, détection de conflits de dates et calcul automatique du prix. Le projet fournit des bases techniques solides facilitant la maintenance et l'évolutivité.
+
+\subsection*{Difficultés rencontrées}
+Plusieurs difficultés ont été rencontrées, notamment :
+\begin{itemize}
+    \item La conception des relations complexes (OneToMany, ManyToOne) en TypeORM.
+    \item La gestion des dates pour éviter les chevauchements de réservations.
+    \item La sécurisation des endpoints avec les guards JWT et les rôles utilisateur.
+\end{itemize}
+
+Ces obstacles ont été surmontés grâce à l'utilisation avancée de TypeORM, aux diagrammes de séquence pour modéliser les flux et à une architecture modulaire bien pensée.
+
+\subsection*{Perspectives}
+Comme suite naturelle, nous envisageons :
+\begin{itemize}
+    \item L'intégration d'un module de paiement en ligne réel (Stripe/PayPal).
+    \item Le développement d'une application mobile React Native pour les clients.
+    \item L'ajout d'un système de notifications par email et SMS.
+    \item L'implémentation de métriques et de dashboards analytiques pour les administrateurs.
+\end{itemize}
+Comme suite naturelle, nous envisageons l'intégration d'un module de paiement en ligne réel (Stripe/PayPal) et le développement d'une application mobile React Native pour les clients.
+
+\end{document}

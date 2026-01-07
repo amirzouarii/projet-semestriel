@@ -1,0 +1,72 @@
+@startuml
+skinparam responseMessageBelowArrow true
+autonumber
+
+actor Client
+participant AuthController
+participant AuthService
+participant HashingService
+participant UserRepository
+database Database
+participant JwtService
+
+title Diagramme de Séquence : Inscription (Register)
+
+Client -> AuthController: POST /auth/register \n{email, motDePasse, nom, prenom}
+activate AuthController
+
+AuthController -> AuthController: Valider DTO \n(class-validator)
+
+alt Échec de la validation
+    AuthController --> Client: 400 Bad Request \n{erreurs de validation}
+end
+
+AuthController -> AuthService: inscription(registerDto)
+activate AuthService
+
+AuthService -> UserRepository: trouverUn({where: {email}})
+activate UserRepository
+
+UserRepository -> Database: SELECT * FROM user WHERE email = ?
+activate Database
+Database --> UserRepository: Utilisateur ou null
+deactivate Database
+
+UserRepository --> AuthService: Utilisateur ou null
+deactivate UserRepository
+
+alt L'utilisateur existe déjà
+    AuthService --> AuthController: Lever ConflictException
+    AuthController --> Client: 409 Conflict \n"L'email existe déjà"
+end
+
+AuthService -> HashingService: hacherMotDePasse(motDePasse)
+activate HashingService
+HashingService -> HashingService: bcrypt.hash(motDePasse, 10)
+HashingService --> AuthService: motDePasseHaché
+deactivate HashingService
+
+AuthService -> UserRepository: sauvegarder({email, motDePasseHaché, nom, prenom})
+activate UserRepository
+
+UserRepository -> Database: INSERT INTO user (...)
+activate Database
+Database --> UserRepository: Entité Utilisateur Créée
+deactivate Database
+
+UserRepository --> AuthService: Entité Utilisateur
+deactivate UserRepository
+
+AuthService -> JwtService: signerAsync({sub: user.id, email})
+activate JwtService
+JwtService -> JwtService: Générer Token JWT
+JwtService --> AuthService: access_token
+deactivate JwtService
+
+AuthService --> AuthController: {access_token, user: {id, email, role...}}
+deactivate AuthService
+
+AuthController --> Client: 201 Created \n{access_token, user}
+deactivate AuthController
+
+@enduml

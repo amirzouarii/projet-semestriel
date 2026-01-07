@@ -52,7 +52,12 @@ export class AuthService {
     return { token };
   }
 
-  async registerUser(dto: { firstName: string; lastName: string; email: string; password: string }) {
+  async registerUser(dto: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) {
     const existingUser = await this.userRepository.findOne({
       where: {
         email: dto.email,

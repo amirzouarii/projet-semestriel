@@ -1,0 +1,131 @@
+@startuml usecase-global
+' Global Use Case Diagram - Vehicle Rental Management System
+
+!define ACTOR_BG #E1F5FF
+!define UC_BG #FFF9C4
+!define SYSTEM_BG #F0F4C3
+
+skinparam backgroundColor #FEFEFE
+skinparam actor {
+    BackgroundColor ACTOR_BG
+    BorderColor #0288D1
+}
+skinparam rectangle {
+    BackgroundColor SYSTEM_BG
+    BorderColor #558B2F
+}
+skinparam usecase {
+    BackgroundColor UC_BG
+    BorderColor #F57F17
+}
+
+actor "Guest / Visiteur" as Guest
+actor "Utilisateur / Client" as User
+actor "Administrateur" as Admin
+
+rectangle "Système de Gestion de Location de Véhicules" {
+
+    ' ============ AUTHENTIFICATION ============
+    package "Authentification" {
+        usecase "Register (Inscription)" as UC_Register
+        usecase "Login (Connexion)" as UC_Login
+    }
+
+    ' ============ DÉCOUVERTE VÉHICULES ============
+    package "Gestion des Véhicules" {
+        usecase "Browse Vehicles\n(Consulter Liste)" as UC_Browse
+        usecase "Search Vehicles\n(Rechercher)" as UC_Search
+        usecase "View Vehicle Details\n(Voir Détails)" as UC_ViewDetails
+        usecase "Manage Vehicles (CRUD)\n(Admin Only)" as UC_ManageVehicles
+    }
+
+    ' ============ RÉSERVATIONS ============
+    package "Réservations" {
+        usecase "Create Reservation\n(Créer)" as UC_CreateRes
+        usecase "View Reservations\n(Consulter)" as UC_ViewRes
+        usecase "Cancel Reservation\n(Annuler)" as UC_CancelRes
+        usecase "Manage Status\n(Admin Only)" as UC_ManageStatus
+    }
+
+    ' ============ PAIEMENTS ============
+    package "Paiements" {
+        usecase "Create Payment\n(Créer)" as UC_CreatePay
+        usecase "Complete Payment\n(Compléter)" as UC_CompletePay
+        usecase "View Payment History\n(Consulter)" as UC_ViewPayHistory
+    }
+
+    ' ============ AVIS ============
+    package "Avis et Évaluations" {
+        usecase "View Reviews\n(Consulter)" as UC_ViewReviews
+        usecase "Write Review\n(Écrire)" as UC_WriteReview
+        usecase "Verify Reviews\n(Admin Only)" as UC_VerifyReview
+    }
+
+    ' ============ MAINTENANCE ============
+    package "Maintenance" {
+        usecase "Create Maintenance\n(Admin Only)" as UC_CreateMaint
+        usecase "View Maintenance History\n(Admin Only)" as UC_ViewMaintHistory
+        usecase "Update Maintenance\n(Admin Only)" as UC_UpdateMaint
+    }
+
+    ' ============ PROFIL ============
+    package "Profil" {
+        usecase "View Profile\n(Consulter Profil)" as UC_ViewProfile
+    }
+}
+
+' ============ ASSOCIATIONS GUEST ============
+Guest --> UC_Register
+Guest --> UC_Login
+Guest --> UC_Browse
+Guest --> UC_Search
+Guest --> UC_ViewDetails
+Guest --> UC_ViewReviews
+
+' ============ ASSOCIATIONS USER ============
+User --> UC_Login
+User --> UC_Browse
+User --> UC_Search
+User --> UC_ViewDetails
+User --> UC_ViewReviews
+User --> UC_CreateRes
+User --> UC_ViewRes
+User --> UC_CancelRes
+User --> UC_CreatePay
+User --> UC_CompletePay
+User --> UC_ViewPayHistory
+User --> UC_WriteReview
+User --> UC_ViewProfile
+
+' ============ ASSOCIATIONS ADMIN ============
+Admin --> UC_Login
+Admin --> UC_Browse
+Admin --> UC_Search
+Admin --> UC_ViewDetails
+Admin --> UC_ViewReviews
+Admin --> UC_ManageVehicles
+Admin --> UC_CreateRes
+Admin --> UC_ViewRes
+Admin --> UC_CancelRes
+Admin --> UC_ManageStatus
+Admin --> UC_CreatePay
+Admin --> UC_CompletePay
+Admin --> UC_ViewPayHistory
+Admin --> UC_WriteReview
+Admin --> UC_VerifyReview
+Admin --> UC_ViewProfile
+Admin --> UC_CreateMaint
+Admin --> UC_ViewMaintHistory
+Admin --> UC_UpdateMaint
+
+' ============ DEPENDENCIES & INCLUDES ============
+UC_CreateRes ..|> UC_ViewDetails : requires
+UC_CreatePay ..|> UC_CreateRes : requires
+UC_CompletePay ..|> UC_CreatePay : completes
+UC_WriteReview ..|> UC_ViewDetails : requires
+UC_VerifyReview ..|> UC_WriteReview : verifies
+UC_ManageStatus ..|> UC_ViewRes : manages
+UC_ManageVehicles ..|> UC_CreateMaint : may trigger
+UC_CompletePay ..> UC_ManageStatus : auto-approves
+
+@enduml

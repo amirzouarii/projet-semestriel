@@ -1,0 +1,60 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+
+' Styling
+skinparam usecase {
+    BackgroundColor White
+    BorderColor DarkSlateGray
+    ArrowColor DarkSlateGray
+}
+skinparam actor {
+    BorderColor DarkSlateGray
+    BackgroundColor White
+}
+
+actor "Client" as client
+actor "Visiteur" as visiteur
+client --|> visiteur
+
+package "Espace Client" {
+    
+    usecase "Se connecter" as UC_Login
+
+    ' --- BOOKING ---
+    package "Réservations" {
+        usecase "Réserver des voitures" as UC_Book
+        usecase "Effectuer la réservation" as UC_MakeRes
+        usecase "Payer la réservation" as UC_PayRes
+        usecase "Consulter ses réservations" as UC_ConsultMyRes
+        usecase "Annuler la réservation" as UC_CancelRes
+    }
+
+    ' --- PROFILE ---
+    package "Mon Profil" {
+        usecase "Gérer profil" as UC_Profile
+        usecase "Changer nom" as UC_ChangeName
+        usecase "Changer mot de passe" as UC_ChangePass
+        usecase "Changer photo" as UC_ChangePhoto
+    }
+}
+
+' Main Connections
+client --> UC_Login
+client --> UC_Book
+client --> UC_Profile
+
+' Booking Extensions
+UC_Book <.. UC_MakeRes : <<extend>>
+UC_Book <.. UC_PayRes : <<extend>>
+UC_Book <.. UC_ConsultMyRes : <<extend>>
+UC_Book <.. UC_CancelRes : <<extend>>
+
+' Profile Extensions
+UC_Profile <.. UC_ChangeName : <<extend>>
+UC_Profile <.. UC_ChangePass : <<extend>>
+UC_Profile <.. UC_ChangePhoto : <<extend>>
+
+@enduml

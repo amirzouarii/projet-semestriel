@@ -1,0 +1,30 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+
+' Styling
+skinparam usecase {
+    BackgroundColor White
+    BorderColor DarkSlateGray
+    ArrowColor DarkSlateGray
+}
+skinparam actor {
+    BorderColor DarkSlateGray
+    BackgroundColor White
+}
+
+actor "Visiteur" as visiteur
+
+package "Espace Public" {
+    usecase "Consulter les voitures" as UC_ConsultCars
+    usecase "Créer un compte" as UC_CreateAccount
+    usecase "Se connecter" as UC_Login
+}
+
+visiteur --> UC_ConsultCars
+visiteur --> UC_CreateAccount
+visiteur --> UC_Login
+
+@enduml

@@ -1,0 +1,58 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+
+' Styling to make it look professional and clean
+skinparam usecase {
+    BackgroundColor White
+    BorderColor DarkSlateGray
+    ArrowColor DarkSlateGray
+}
+skinparam actor {
+    BorderColor DarkSlateGray
+    BackgroundColor White
+}
+
+' --- ACTORS ---
+actor "Visiteur" as visiteur
+actor "Client" as client
+actor "Admin" as admin
+
+' Inheritance
+client --|> visiteur
+
+package "Système de Location de Voitures" {
+    
+    ' --- PUBLIC / CLIENT SIDE ---
+    usecase "Consulter les voitures" as UC_ConsultCars
+    usecase "Créer un compte" as UC_CreateAccount
+    usecase "Se connecter" as UC_Login
+    usecase "Réserver des voitures" as UC_Book
+    usecase "Gérer profil" as UC_Profile
+    
+    ' --- ADMIN SIDE ---
+    usecase "Gérer les voitures" as UC_ManageCars
+    usecase "Gérer les comptes clients" as UC_ManageClients
+    usecase "Gérer les réservations" as UC_ManageRes
+}
+
+' --- CONNECTIONS ---
+
+' Visiteur connections
+visiteur --> UC_ConsultCars
+visiteur --> UC_CreateAccount
+visiteur --> UC_Login
+
+' Client connections (inherits UC_ConsultCars and UC_Login from visiteur)
+client --> UC_Book
+client --> UC_Profile
+
+' Admin connections
+admin --> UC_ManageCars
+admin --> UC_ManageClients
+admin --> UC_ManageRes
+admin --> UC_Login
+
+@enduml

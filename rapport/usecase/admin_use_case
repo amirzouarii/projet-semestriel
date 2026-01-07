@@ -1,0 +1,70 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam shadowing false
+
+' Styling
+skinparam usecase {
+    BackgroundColor White
+    BorderColor DarkSlateGray
+    ArrowColor DarkSlateGray
+}
+skinparam actor {
+    BorderColor DarkSlateGray
+    BackgroundColor White
+}
+
+actor "Admin" as admin
+
+package "Administration" {
+    
+    usecase "Se connecter" as UC_Login
+
+    ' --- CAR MANAGEMENT ---
+    package "Gestion Parc Automobile" {
+        usecase "Gérer les voitures" as UC_ManageCars
+        usecase "Ajouter une voiture" as UC_AddCar
+        usecase "Modifier une voiture" as UC_ModCar
+        usecase "Supprimer une voiture" as UC_DelCar
+        usecase "Voir une voiture" as UC_ViewCar
+    }
+
+    ' --- CLIENT MANAGEMENT ---
+    package "Gestion Utilisateurs" {
+        usecase "Gérer les comptes clients" as UC_ManageClients
+        usecase "Ajouter un client" as UC_AddClient
+        usecase "Modifier un client" as UC_ModClient
+        usecase "Supprimer un client" as UC_DelClient
+        usecase "Voir un client" as UC_ViewClient
+    }
+
+    ' --- RESERVATION MANAGEMENT ---
+    package "Gestion Réservations" {
+        usecase "Gérer les réservations" as UC_ManageRes
+        usecase "Voir les réservations" as UC_ViewResAdmin
+    }
+}
+
+' Admin Main Connections
+admin --> UC_Login
+admin --> UC_ManageCars
+admin --> UC_ManageClients
+admin --> UC_ManageRes
+
+' Car Sub-cases
+UC_ManageCars <.. UC_AddCar : <<extend>>
+UC_ManageCars <.. UC_ModCar : <<extend>>
+UC_ManageCars <.. UC_DelCar : <<extend>>
+UC_ManageCars <.. UC_ViewCar : <<extend>>
+
+' Client Sub-cases
+UC_ManageClients <.. UC_AddClient : <<extend>>
+UC_ManageClients <.. UC_ModClient : <<extend>>
+UC_ManageClients <.. UC_DelClient : <<extend>>
+UC_ManageClients <.. UC_ViewClient : <<extend>>
+
+' Reservation Sub-cases
+UC_ManageRes <.. UC_ViewResAdmin : <<extend>>
+
+@enduml

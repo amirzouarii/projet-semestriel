@@ -1,0 +1,65 @@
+@startuml
+skinparam responseMessageBelowArrow true
+autonumber
+
+actor Client
+participant AuthController
+participant AuthService
+participant HashingService
+participant UserRepository
+database Database
+participant JwtService
+
+title Diagramme de Séquence : Connexion (Login)
+
+Client -> AuthController: POST /auth/login \n{email, motDePasse}
+activate AuthController
+
+AuthController -> AuthController: Valider DTO \n(class-validator)
+
+alt Échec de la validation
+    AuthController --> Client: 400 Bad Request \n{erreurs de validation}
+end
+
+AuthController -> AuthService: loginUser(loginDto)
+activate AuthService
+
+AuthService -> UserRepository: createQueryBuilder('user')\n.addSelect('user.password')\n.where(email)
+activate UserRepository
+
+UserRepository -> Database: SELECT * FROM user WHERE email = ?
+activate Database
+Database --> UserRepository: Utilisateur (avec mdp) ou null
+deactivate Database
+
+UserRepository --> AuthService: Utilisateur ou null
+deactivate UserRepository
+
+alt Utilisateur inexistant
+    AuthService --> AuthController: Lever BadRequestException \n(Invalid credentials)
+    AuthController --> Client: 400 Bad Request \n{message: "Invalid credentials"}
+end
+
+AuthService -> HashingService: compare(motDePasse, user.password)
+activate HashingService
+HashingService --> AuthService: estValide (booléen)
+deactivate HashingService
+
+alt Mot de passe invalide
+    AuthService --> AuthController: Lever BadRequestException \n(Invalid credentials)
+    AuthController --> Client: 400 Bad Request \n{message: "Invalid credentials"}
+end
+
+AuthService -> JwtService: generateToken({userId, nom, prenom, email, role})
+activate JwtService
+JwtService -> JwtService: Générer Token JWT
+JwtService --> AuthService: token
+deactivate JwtService
+
+AuthService --> AuthController: { token }
+deactivate AuthService
+
+AuthController --> Client: 200 OK \n{ token }
+deactivate AuthController
+
+@enduml
