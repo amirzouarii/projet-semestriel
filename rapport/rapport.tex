@@ -560,6 +560,50 @@ export class ReservationController {
 
 Ces endpoints sécurisés illustrent comment les rôles (ADMIN/USER) sont appliqués. L'endpoint \texttt{POST /reservations} crée une réservation (accessible aux clients authentifiés), tandis que \texttt{PATCH /reservations/:id/status} permet seulement aux administrateurs de changer le statut d'une réservation. Le système utilise le contexte de l'utilisateur (extrait du JWT) pour appliquer les restrictions appropriées.
 
+\section{Interface Utilisateur et Écrans de l'Application}
+
+L'interface frontend a été développée avec React et Vite, proposant une expérience utilisateur fluide et intuitive. Voici les écrans principaux de l'application :
+
+\subsection{Page d'Authentification}
+La page de connexion permet aux utilisateurs de s'authentifier de manière sécurisée. Les données sont validées et envoyées à l'API backend, qui retourne un JWT utilisé pour les requêtes suivantes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{screenshots/login_page.png}
+    \caption{Page de connexion (Sign In) - Interface d'authentification sécurisée}
+    \label{fig:login-page}
+\end{figure}
+
+\subsection{Page d'Accueil}
+La page d'accueil présente une sélection des véhicules disponibles et met en avant les avantages de l'agence (Large Sélection, Assurance Complète, Réservation Facile). Cette page est accessible aux visiteurs non authentifiés et aux utilisateurs connectés.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{screenshots/homepage.png}
+    \caption{Page d'accueil - Présentation des véhicules disponibles et des avantages du service}
+    \label{fig:homepage}
+\end{figure}
+
+\subsection{Catalogue des Véhicules}
+La page de catalogue affiche la liste complète des véhicules disponibles avec des filtres par marque et par état (Disponible, En maintenance, Réservé). Les utilisateurs peuvent rechercher, filtrer et consulter les détails de chaque véhicule, y compris le prix journalier et la disponibilité.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{screenshots/cars_page.png}
+    \caption{Catalogue des véhicules - Affichage avec filtres et recherche}
+    \label{fig:cars-page}
+\end{figure}
+
+\subsection{Tableau de Bord Administrateur}
+Le tableau de bord administrateur offre une vue globale des opérations de l'agence. Il affiche la gestion des utilisateurs, la liste des réservations et le suivi des maintenances. Les administrateurs peuvent effectuer des actions telles que modifier les statuts des réservations, gérer les véhicules, et visualiser les détails des clients.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{screenshots/admin_dashboard.png}
+    \caption{Tableau de bord administrateur - Gestion centralisée des utilisateurs, réservations et maintenances}
+    \label{fig:admin-dashboard}
+\end{figure}
+
 \section{Documentation API (Swagger)}
 Afin de faciliter l'intégration avec le Frontend, nous avons généré une documentation automatique via Swagger. Cela permet de visualiser tous les endpoints disponibles, les paramètres requis et les réponses attendues.
 
